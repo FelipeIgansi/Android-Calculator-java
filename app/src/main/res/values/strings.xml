@@ -11,4 +11,26 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <string name="btnDivide">/</string>
+    <string name="btnMenos">-</string>
+    <string name="btnSoma">+</string>
+    <string name="btnNumUm">1</string>
+    <string name="btnNumZero">0</string>
+    <string name="btnInverteSinal">+/-</string>
+    <string name="btnPonto">,</string>
+    <string name="btnNumCinco">5</string>
+    <string name="btn_NumSeis">6</string>
+    <string name="btn_NumOito">8</string>
+    <string name="btn_ClearEntry">CE</string>
+    <string name="btn_Quatro">4</string>
+    <string name="btn_NumNove">9</string>
+    <string name="btn_NumTres">3</string>
+    <string name="btn_Multiplica">x</string>
+    <string name="btn_Percent">%</string>
+    <string name="btn_NumDois">2</string>
+    <string name="btn_NumSete">7</string>
+    <string name="btn_Result">=</string>
+    <string name="btn_Clear">C</string>
+    <string name="mostra_resultado">Mostra Resultado</string>
+    <string name="mostra_operaces">Mostra Operações</string>
 </resources>
