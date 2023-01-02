@@ -71,7 +71,7 @@
         android:textColor="@color/white"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/btn_Tres"
-        app:layout_constraintEnd_toStartOf="@+id/btn_Menos"
+        app:layout_constraintEnd_toStartOf="@+id/btn_Subtracao"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_Cinco"
         app:layout_constraintTop_toBottomOf="@+id/btn_Nove" />
@@ -88,7 +88,7 @@
         android:textColor="@color/white"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/btn_Seis"
-        app:layout_constraintEnd_toStartOf="@+id/btn_Multiplica"
+        app:layout_constraintEnd_toStartOf="@+id/btn_Multiplicacao"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_Oito"
         app:layout_constraintTop_toBottomOf="@+id/btn_Clear" />
@@ -106,7 +106,7 @@
         android:textColor="@color/white"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_Result"
+        app:layout_constraintEnd_toStartOf="@+id/btn_Resultado"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_Zero"
         app:layout_constraintTop_toBottomOf="@+id/btn_Tres" />
@@ -146,7 +146,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btn_Seis" />
 
     <Button
-        android:id="@+id/btn_Divide"
+        android:id="@+id/btn_Divisao"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="2dp"
@@ -156,7 +156,7 @@
         android:text="@string/btnDivide"
         android:textColor="@color/white"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/btn_Multiplica"
+        app:layout_constraintBottom_toTopOf="@+id/btn_Multiplicacao"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_Clear"
@@ -164,7 +164,7 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
-        android:id="@+id/btn_Multiplica"
+        android:id="@+id/btn_Multiplicacao"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="2dp"
@@ -174,11 +174,11 @@
         android:text="@string/btn_Multiplica"
         android:textColor="@color/white"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/btn_Menos"
+        app:layout_constraintBottom_toTopOf="@+id/btn_Subtracao"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_Nove"
-        app:layout_constraintTop_toBottomOf="@+id/btn_Divide" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_Divisao" />
 
     <Button
         android:id="@+id/btn_Um"
@@ -228,14 +228,14 @@
         android:text="@string/btnSoma"
         android:textColor="@color/white"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/btn_Result"
+        app:layout_constraintBottom_toTopOf="@+id/btn_Resultado"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_Tres"
-        app:layout_constraintTop_toBottomOf="@+id/btn_Menos" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_Subtracao" />
 
     <Button
-        android:id="@+id/btn_Menos"
+        android:id="@+id/btn_Subtracao"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="2dp"
@@ -250,7 +250,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_Seis"
-        app:layout_constraintTop_toBottomOf="@+id/btn_Multiplica" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_Multiplicacao" />
 
     <Button
         android:id="@+id/btn_Dois"
@@ -325,7 +325,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btn_Dois" />
 
     <Button
-        android:id="@+id/btn_Result"
+        android:id="@+id/btn_Resultado"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="2dp"
@@ -354,7 +354,7 @@
         android:textColor="@color/white"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/btn_Nove"
-        app:layout_constraintEnd_toStartOf="@+id/btn_Divide"
+        app:layout_constraintEnd_toStartOf="@+id/btn_Divisao"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_ClearEntry"
         app:layout_constraintTop_toBottomOf="@+id/txtMostraResultado"
