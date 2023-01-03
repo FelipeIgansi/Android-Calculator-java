@@ -32,7 +32,7 @@ public class Operacoes implements Serializable {
         return  1;
     }
 
-    public  void limpaTela(){
+    public  void limpaLista(){
         this.valor.clear();
     }
 

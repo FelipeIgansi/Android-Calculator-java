@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
     TextView campoMostraResultado;
     String valorImpresso = "";
     Button botao;
+    int total = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setarValor(R.id.btn_Nove, 9);
         setarValor(R.id.btn_Zero, 0);
         setarOperacao(R.id.btn_Soma, "+");
+        setarOperacao(R.id.btn_Resultado, "=");
         setarOperacao(R.id.btn_Clear, "C");
 
     }
@@ -42,25 +44,30 @@ public class MainActivity extends AppCompatActivity {
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                operacoes.setValor(convert.toInt(valorImpresso));
                 if (operacaoRealizada == "C"){
-                    operacoes.limpaTela();
+                    operacoes.limpaLista();
                     valorImpresso = "";
                     exibeValorEmOperacoes(valorImpresso);
                 }
                 else if (operacaoRealizada == "+"){
-                    operacoes.setValor(convert.toInt(valorImpresso));
-                    if (operacoes.getListSize() >1){
-                        exibeValorEmResultados(operacoes.soma());
-                    }
-                    exibeValorEmOperacoes(operacaoRealizada);
                     operacoes.setOperacao(operacaoRealizada);
                     valorImpresso = "";
+                    exibeValorEmOperacoes(valorImpresso);
 
                 }
                 else if (operacaoRealizada == "-") {
                     //exibeValorEmOperacoes(operacaoRealizada);
                     //operacoes.setOperacao(operacaoRealizada);
                    // exibeValorEmResultados(Operacoes.subtracao(valorImpresso));
+                }else  if(operacaoRealizada == "="){
+                    if (operacoes.getOperacao() == "+")
+                        total = operacoes.soma();
+
+                    exibeValorEmResultados(total);
+                    operacoes.limpaLista();
+                    valorImpresso = "";
+                    exibeValorEmOperacoes(valorImpresso);
                 }
 
             }
@@ -73,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 exibeValorEmOperacoes(convert.toStr(valor));
-
             }
         });
     }
@@ -86,5 +92,7 @@ public class MainActivity extends AppCompatActivity {
     private void exibeValorEmResultados(int valor){
         campoMostraResultado = findViewById(R.id.txtMostraResultado);
         campoMostraResultado.setText(convert.toStr(valor));
+        valorImpresso = "";
+
     }
 }
