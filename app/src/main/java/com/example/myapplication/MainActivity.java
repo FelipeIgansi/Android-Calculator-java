@@ -1,12 +1,10 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.example.myapplication.model.operacao;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,11 +28,23 @@ public class MainActivity extends AppCompatActivity {
         setaValor(R.id.btn_Sete, "7");
         setaValor(R.id.btn_Oito, "8");
         setaValor(R.id.btn_Nove, "9");
-//        exibeNumero(R.id.btn_Soma, "+");
-//        exibeNumero(R.id.btn_Subtracao, "-");
-//        exibeNumero(R.id.btn_Divisao, "/");
-//        exibeNumero(R.id.btn_Multiplicacao, "X");
-//        exibeNumero(R.id.btn_Resultado, "=");
+        setaOperacao(R.id.btn_Soma, "+");
+        setaFuncao(R.id.btn_Clear, "C");
+
+    }
+
+    private void setaFuncao(int idBotaoFuncao, String funcaoRealizada) {
+        botao = findViewById(idBotaoFuncao);
+        botao.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (funcaoRealizada == "C"){
+                    operacao.setValor("");
+                    valorImpresso = "";
+                    exibeValorEmOperacoes(valorImpresso);
+                }
+            }
+        });
     }
 
     private void exibeValorEmOperacoes(String valor){
@@ -48,12 +58,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void setaoperacao(int idBotaoOperacao, String operacao) {
-        Button botao = findViewById(idBotaoOperacao);
+    private void setaOperacao(int idBotaoOperacao, String operacaoRealizada) {
+        botao = findViewById(idBotaoOperacao);
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //operacao.soma(valor);
+                exibeValorEmOperacoes(operacaoRealizada);
+                operacao.setOperacao(operacaoRealizada);
             }
         });
     }
@@ -62,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 exibeValorEmOperacoes(valor);
                 operacao.setValor(valor);
             }

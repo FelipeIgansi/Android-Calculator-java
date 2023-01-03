@@ -16,16 +16,22 @@ public class operacao implements Serializable {
         int Valor = Integer.parseInt(this.valor);
         return Valor + valor;
     }
-//    public int subtracao(int valor){
-//        return this.valor -= valor;
-//    }
-//    public int divisao(int valor){
-//        return this.valor /= valor;
-//    }
-//    public int multiplicacao(int valor){
-//        return this.valor *= valor;
-//    }
+    public int subtracao(int valor){
+        int Valor = Integer.parseInt(this.valor);
+        return Valor - valor;
+    }
+    public int divisao(int valor){
+        int Valor = Integer.parseInt(this.valor);
+        return Valor / valor;
+    }
+    public int multiplicacao(int valor){
+        int Valor = Integer.parseInt(this.valor);
+        return Valor * valor;
+    }
 
+    public  void limpaTela(){
+        this.valor ="";
+    }
 
 
     public String getValor() {
