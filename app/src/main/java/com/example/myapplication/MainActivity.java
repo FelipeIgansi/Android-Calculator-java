@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
         setarValor(R.id.btn_Nove, 9);
         setarValor(R.id.btn_Zero, 0);
         setarOperacao(R.id.btn_Soma, "+");
+        setarOperacao(R.id.btn_Subtracao, "-");
+        setarOperacao(R.id.btn_Multiplicacao, "x");
+        setarOperacao(R.id.btn_Divisao, "/");
         setarOperacao(R.id.btn_Resultado, "=");
         setarOperacao(R.id.btn_Clear, "C");
 
@@ -44,11 +47,13 @@ public class MainActivity extends AppCompatActivity {
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                operacoes.setValor(convert.toInt(valorImpresso));
+                if (valorImpresso != "")
+                    operacoes.setValor(convert.toInt(valorImpresso));
                 if (operacaoRealizada == "C"){
                     operacoes.limpaLista();
                     valorImpresso = "";
                     exibeValorEmOperacoes(valorImpresso);
+                    exibeValorEmResultados(valorImpresso);
                 }
                 else if (operacaoRealizada == "+"){
                     operacoes.setOperacao(operacaoRealizada);
@@ -57,14 +62,31 @@ public class MainActivity extends AppCompatActivity {
 
                 }
                 else if (operacaoRealizada == "-") {
-                    //exibeValorEmOperacoes(operacaoRealizada);
-                    //operacoes.setOperacao(operacaoRealizada);
-                   // exibeValorEmResultados(Operacoes.subtracao(valorImpresso));
-                }else  if(operacaoRealizada == "="){
+                    operacoes.setOperacao(operacaoRealizada);
+                    valorImpresso = "";
+                    exibeValorEmOperacoes(valorImpresso);
+                }
+                else if (operacaoRealizada == "x") {
+                    operacoes.setOperacao(operacaoRealizada);
+                    valorImpresso = "";
+                    exibeValorEmOperacoes(valorImpresso);
+                }
+                else if (operacaoRealizada == "/") {
+                    operacoes.setOperacao(operacaoRealizada);
+                    valorImpresso = "";
+                    exibeValorEmOperacoes(valorImpresso);
+                }
+                else  if(operacaoRealizada == "="){
                     if (operacoes.getOperacao() == "+")
                         total = operacoes.soma();
+                    else if (operacoes.getOperacao() == "-")
+                        total = operacoes.subtracao();
+                    else if (operacoes.getOperacao() == "x")
+                        total = operacoes.multiplicacao();
+                    else if (operacoes.getOperacao() == "/")
+                        total = operacoes.divisao();
 
-                    exibeValorEmResultados(total);
+                    exibeValorEmResultados(convert.toStr(total));
                     operacoes.limpaLista();
                     valorImpresso = "";
                     exibeValorEmOperacoes(valorImpresso);
@@ -89,9 +111,9 @@ public class MainActivity extends AppCompatActivity {
         campoMostraOperacoes = findViewById(R.id.txtMostraOperacoes);
         campoMostraOperacoes.setText(valorImpresso);
     }
-    private void exibeValorEmResultados(int valor){
+    private void exibeValorEmResultados(String valor){
         campoMostraResultado = findViewById(R.id.txtMostraResultado);
-        campoMostraResultado.setText(convert.toStr(valor));
+        campoMostraResultado.setText(valor);
         valorImpresso = "";
 
     }

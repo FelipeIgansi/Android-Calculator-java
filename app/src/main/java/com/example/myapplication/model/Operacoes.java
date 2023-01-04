@@ -22,14 +22,30 @@ public class Operacoes implements Serializable {
         }
         return  total;
     }
-    public int subtracao(int valor){
-        return  1;
+    public int subtracao(){
+        int total= 0;
+        for (int i = 0; i < (this.valor.size()-1); i++) {
+            if(this.valor.get(i) < this.valor.get(i+1)) {
+                total = this.valor.get(i+1) - this.valor.get(i);
+            }
+            total = this.valor.get(i) - this.valor.get(i + 1);
+
+        }
+        return  total;
     }
-    public int divisao(int valor){
-        return  1;
+    public int divisao(){
+        int total= 0;
+        for (int i = 0; i < (this.valor.size() - 1); i++) {
+            total = this.valor.get(i)/this.valor.get(i+1);
+        }
+        return  total;
     }
-    public int multiplicacao(int valor){
-        return  1;
+    public int multiplicacao(){
+        int total= 0;
+        for (int i = 0; i < (this.valor.size() - 1); i++) {
+            total = this.valor.get(i)*this.valor.get(i+1);
+        }
+        return  total;
     }
 
     public  void limpaLista(){
