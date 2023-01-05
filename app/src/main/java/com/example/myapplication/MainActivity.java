@@ -16,12 +16,18 @@ public class MainActivity extends AppCompatActivity {
     String valorImpresso = "";
     Button botao;
     int total = 0;
+    private boolean btnResultFoiClicado = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        IniciaBotoes();
+
+    }
+
+    private void IniciaBotoes() {
         setarValor(R.id.btn_Um, 1);
         setarValor(R.id.btn_Dois, 2);
         setarValor(R.id.btn_Tres, 3);
@@ -38,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setarOperacao(R.id.btn_Divisao, "/");
         setarOperacao(R.id.btn_Resultado, "=");
         setarOperacao(R.id.btn_Clear, "C");
-
+        setarOperacao(R.id.btn_ClearEntry, "CE");
     }
 
     private void setarOperacao(int idBotaoOperacao, String operacaoRealizada) {
@@ -48,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
                 operacoes.setValor(convert.toInt(valorImpresso));
             switch (operacaoRealizada) {
                 case "C":
+                case "CE":
+                    // Por enquanto deixarei a função Clear Entry Igual a Clear,
+                    // para futuramente implementar a função corretamente
                     operacoes.limpaLista();
                     valorImpresso = "";
                     exibeValorEmOperacoes(valorImpresso);
@@ -57,6 +66,10 @@ public class MainActivity extends AppCompatActivity {
                 case "-":
                 case "x":
                 case "/":
+                    if(btnResultFoiClicado == true){
+                        exibeValorEmResultados("");
+                        btnResultadoFoiClicado(false);
+                    }
                     operacoes.setOperacao(operacaoRealizada);
                     valorImpresso = "";
                     exibeValorEmOperacoes(valorImpresso);
@@ -65,15 +78,19 @@ public class MainActivity extends AppCompatActivity {
                     switch (operacoes.getOperacao()) {
                         case "+":
                             total = operacoes.soma();
+                            btnResultadoFoiClicado(true);
                             break;
                         case "-":
                             total = operacoes.subtracao();
+                            btnResultadoFoiClicado(true);
                             break;
                         case "x":
                             total = operacoes.multiplicacao();
+                            btnResultadoFoiClicado(true);
                             break;
                         case "/":
                             total = operacoes.divisao();
+                            btnResultadoFoiClicado(true);
                             break;
                     }
 
@@ -85,6 +102,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+    }
+
+    private void btnResultadoFoiClicado(boolean valor) {
+        btnResultFoiClicado = valor;
     }
 
     private void setarValor(int idBotao, int valor) {
