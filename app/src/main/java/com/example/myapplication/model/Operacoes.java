@@ -23,15 +23,9 @@ public class Operacoes implements Serializable {
         return  total;
     }
     public int subtracao(){
-        int total= 0;
-        for (int i = 0; i < (this.valor.size()-1); i++) {
-            if(this.valor.get(i) < this.valor.get(i+1)) {
-                total = this.valor.get(i+1) - this.valor.get(i);
-            }
-            total = this.valor.get(i) - this.valor.get(i + 1);
-
-        }
-        return  total;
+        return this.valor.get(0) - this.valor.get(1);
+        // Implementacao não está correta
+        // Apos implementar calculo de expressões corrigir isso
     }
     public int divisao(){
         int total= 0;
@@ -54,6 +48,9 @@ public class Operacoes implements Serializable {
 
     public int getValor(int id) {
         return valor.get(id);
+    }
+    public int returnListSize(){
+        return this.valor.size();
     }
 
     public String getOperacao() {
