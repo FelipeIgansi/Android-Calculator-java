@@ -9,13 +9,11 @@ import com.example.myapplication.util.Convert;
 
 public class MainActivity extends AppCompatActivity {
 
-    Operacoes operacoes = new Operacoes();
-    Convert convert = new Convert();
-    TextView campoMostraOperacoes;
-    TextView campoMostraResultado;
-    String valorImpresso = "";
-    Button botao;
-    int total = 0;
+    private Operacoes operacoes = new Operacoes();
+    private Convert convert = new Convert();
+    private String valorImpresso = "";
+    private Button botao;
+    private int total = 0;
     private boolean btnResultFoiClicado = false;
 
     @Override
@@ -39,19 +37,41 @@ public class MainActivity extends AppCompatActivity {
         setarValor(R.id.btn_Nove, 9);
         setarValor(R.id.btn_Zero, 0);
         setarOperacao(R.id.btn_Soma, "+");
-        setarOperacao(R.id.btn_InverteSinal, "+/-");
         setarOperacao(R.id.btn_Subtracao, "-");
         setarOperacao(R.id.btn_Multiplicacao, "x");
         setarOperacao(R.id.btn_Divisao, "/");
-        setarOperacao(R.id.btn_Resultado, "=");
-        setarOperacao(R.id.btn_Clear, "C");
-        setarOperacao(R.id.btn_ClearEntry, "CE");
+        realizaFuncao(R.id.btn_InverteSinal, "+/-");
+        realizaFuncao(R.id.btn_Resultado, "=");
+        realizaFuncao(R.id.btn_Clear, "C");
+        realizaFuncao(R.id.btn_ClearEntry, "CE");
     }
 
     private void setarOperacao(int idBotaoOperacao, String operacaoRealizada) {
         botao = findViewById(idBotaoOperacao);
         botao.setOnClickListener(view -> {
             switch (operacaoRealizada) {
+                case "+":
+                case "-":
+                case "x":
+                case "/":
+                    setaValorAtualNaLista();
+                    if(btnResultFoiClicado){
+                        exibeValorEmResultados("");
+                        btnResultadoFoiClicado(false);
+                    }
+                    operacoes.setOperacao(operacaoRealizada);
+                    LimpaTela();
+                    break;
+            }
+
+        });
+    }
+
+    private void realizaFuncao(int idBotaoFuncao, String funcaoRealizada){
+        botao = findViewById(idBotaoFuncao);
+        botao.setOnClickListener(
+                view -> {
+            switch (funcaoRealizada) {
                 case "C":
                 case "CE":
                     // Por enquanto deixarei a função Clear Entry Igual a Clear,
@@ -60,8 +80,9 @@ public class MainActivity extends AppCompatActivity {
                     LimpaTela();
                     exibeValorEmResultados(valorImpresso);
                     break;
+
                 case "+/-":
-                    int valor = operacoes.getValor(operacoes.returnListSize()-1);
+                    int valor = operacoes.getValor(operacoes.returnListSize() - 1);
                     if (valor > 0)
                         valor = -valor;
                     else
@@ -72,18 +93,7 @@ public class MainActivity extends AppCompatActivity {
                     LimpaTela();
                     exibeValorEmOperacoes(convert.toStr(valor));
                     break;
-                case "+":
-                case "-":
-                case "x":
-                case "/":
-                    setaValorAtualNaLista();
-                    if(btnResultFoiClicado == true){
-                        exibeValorEmResultados("");
-                        btnResultadoFoiClicado(false);
-                    }
-                    operacoes.setOperacao(operacaoRealizada);
-                    LimpaTela();
-                    break;
+
                 case "=":
                     setaValorAtualNaLista();
                     switch (operacoes.getOperacao()) {
@@ -109,8 +119,8 @@ public class MainActivity extends AppCompatActivity {
                     operacoes.limpaLista();
                     LimpaTela();
                     break;
-            }
 
+            }
         });
     }
 
@@ -135,11 +145,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void exibeValorEmOperacoes(String valor){
         valorImpresso += valor;
-        campoMostraOperacoes = findViewById(R.id.txtMostraOperacoes);
+        TextView campoMostraOperacoes = findViewById(R.id.txtMostraOperacoes);
         campoMostraOperacoes.setText(valorImpresso);
     }
     private void exibeValorEmResultados(String valor){
-        campoMostraResultado = findViewById(R.id.txtMostraResultado);
+        TextView campoMostraResultado = findViewById(R.id.txtMostraResultado);
         campoMostraResultado.setText(valor);
         valorImpresso = "";
 
