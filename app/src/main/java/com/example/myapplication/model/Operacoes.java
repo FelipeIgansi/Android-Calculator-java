@@ -9,7 +9,7 @@ import java.util.List;
 public class Operacoes implements Serializable {
     @NonNull
     private List<Integer> valor = new ArrayList<>();
-    private String operacao;
+    private String operacao = "";
 
 
     public Operacoes(){}
