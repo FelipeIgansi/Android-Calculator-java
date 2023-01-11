@@ -18,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
     private Convert convert = new Convert();
     private List<String> valorImpresso = new ArrayList<>();
     private Button botao;
-    private int total = 0;
     private boolean btnResultFoiClicado = false;
 
     @Override
@@ -72,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
                     operacoes.setOperacao(operacaoRealizada);
                     setaValorImpresso(operacaoRealizada);
                     exibeValorEmOperacoes(retornaExpressao());
-//                    LimpaTela();
                     break;
             }
 
@@ -88,20 +86,18 @@ public class MainActivity extends AppCompatActivity {
                         case "CE":
                             // Por enquanto deixarei a função Clear Entry Igual a Clear,
                             // para futuramente implementar a função corretamente
-                            operacoes.limpaLista();
                             LimpaTela();
-                            exibeValorEmOperacoes("");
-                            exibeValorEmResultados("");
+                            exibeValorEmOperacoes(retornaExpressao());
+                            exibeValorEmResultados(retornaExpressao());
                             break;
 
                         case "+/-":
-                            int valor = operacoes.getValor(operacoes.returnListSize() - 1);
+                            int valor = operacoes.getValor(operacoes.returnSizeOfValue() - 1);
                             if (valor > 0)
                                 valor = -valor;
                             else
                                 valor = -valor;
 
-//                    valorImpresso = convert.toStr(valor);
                             setaValorAtualNaLista();
                             LimpaTela();
                             exibeValorEmOperacoes(convert.toStr(valor));
@@ -109,27 +105,34 @@ public class MainActivity extends AppCompatActivity {
 
                         case "=":
                             setaValorAtualNaLista();
-                            switch (operacoes.getOperacao()) {
-                                case "+":
-                                    total = operacoes.soma();
-                                    btnResultadoFoiClicado(true);
-                                    break;
-                                case "-":
-                                    total = operacoes.subtracao();
-                                    btnResultadoFoiClicado(true);
-                                    break;
-                                case "X":
-                                    total = operacoes.multiplicacao();
-                                    btnResultadoFoiClicado(true);
-                                    break;
-                                case "/":
-                                    total = operacoes.divisao();
-                                    btnResultadoFoiClicado(true);
-                                    break;
+                            int total = operacoes.getValor(0);
+                            int j = 1;
+                            for (int i = 0; i < operacoes.returnSizeOfOperations(); i++) {
+                                for (int r = j; r < operacoes.returnSizeOfValue(); r++) {
+                                    if (operacoes.getOperacao(i).equals("+")) {
+                                        total = operacoes.soma(total, operacoes.getValor(r));
+                                        btnResultadoFoiClicado(true);
+                                        j = r+1;
+                                        break;
+                                    } else if (operacoes.getOperacao(i).equals("-")) {
+                                        total = operacoes.subtracao(total, operacoes.getValor(r));
+                                        btnResultadoFoiClicado(true);
+                                        j = r+1;
+                                        break;
+                                    } else if (operacoes.getOperacao(i).equals("X")) {
+                                        total = operacoes.multiplicacao(total, operacoes.getValor(r));
+                                        btnResultadoFoiClicado(true);
+                                        j = r+1;
+                                        break;
+                                    } else if (operacoes.getOperacao(i).equals("/")) {
+                                        total = operacoes.divisao(total, operacoes.getValor(r));
+                                        btnResultadoFoiClicado(true);
+                                        j = r+1;
+                                        break;
+                                    }
+                                }
                             }
-
                             exibeValorEmResultados(convert.toStr(total));
-                            operacoes.limpaLista();
                             LimpaTela();
                             break;
 
@@ -137,16 +140,16 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+
     private void setaValorAtualNaLista() {
         String ValorAtual = "";
         for (int i = 0; i < valorImpresso.size(); i++) {
             if (valorImpresso.get(i).equals("+") || // Gambiarra para consertar depois
                     valorImpresso.get(i).equals("-") ||
                     valorImpresso.get(i).equals("/") ||
-                    valorImpresso.get(i).equals("X"))
-            {
+                    valorImpresso.get(i).equals("X")) {
                 ValorAtual = "";
-            }else{
+            } else {
                 ValorAtual += valorImpresso.get(i);
 
             }
@@ -156,6 +159,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void LimpaTela() {
         valorImpresso.clear();
+        operacoes.limpaLista();
+        operacoes.limpaOperacao();
         exibeValorEmOperacoes("");
     }
 
@@ -186,7 +191,5 @@ public class MainActivity extends AppCompatActivity {
     private void exibeValorEmResultados(String valor) {
         TextView campoMostraResultado = findViewById(R.id.txtMostraResultado);
         campoMostraResultado.setText(valor);
-        valorImpresso.clear();
-
     }
 }
