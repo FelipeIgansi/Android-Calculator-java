@@ -147,10 +147,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void CancelarEntrada() {
-        valorImpresso.remove(valorImpresso.size()-1);
-        operacoes.removePorIDListaValores(operacoes.returnSizeOfValue()-1);
-        exibeValorEmOperacoes(retornaExpressao());
+        label: for (int i = valorImpresso.size() - 1; i >= 0; i--) {
+            if (listaOperacoes.contains(valorImpresso.get(i))) {
+                for (int j = valorImpresso.size() - 1; j >= i; j--) {
+                    valorImpresso.remove(j);
+//                        operacoes.removePorIDListaValores(j);
+                }
+                break label;
+            } else if (!(listaOperacoes.contains(valorImpresso.get(i))) && i == 0){
+                LimpaTela();
 
+            }
+        }
+
+        exibeValorEmOperacoes(retornaExpressao());
     }
 
     private int buscaValorImpresso() {
