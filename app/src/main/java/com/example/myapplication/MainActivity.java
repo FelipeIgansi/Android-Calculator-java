@@ -10,13 +10,18 @@ import com.example.myapplication.model.Operacoes;
 import com.example.myapplication.util.Convert;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Operacoes operacoes = new Operacoes();
-    private Convert convert = new Convert();
-    private List<String> valorImpresso = new ArrayList<>();
+    private static final Set<String> listaOperacoes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("+", "-", "/", "X")));
+    private final Operacoes operacoes = new Operacoes();
+    private final Convert convert = new Convert();
+    private final List<String> valorImpresso = new ArrayList<>();
     private Button botao;
     private boolean btnResultFoiClicado = false;
 
@@ -47,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         realizaFuncao(R.id.btn_InverteSinal, "+/-");
         realizaFuncao(R.id.btn_Resultado, "=");
         realizaFuncao(R.id.btn_Clear, "C");
-        realizaFuncao(R.id.btn_ClearEntry, "CE");
+        realizaFuncao(R.id.btn_CancelEntry, "CE");
     }
 
     private void setarValor(int idBotao, int valor) {
@@ -64,10 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 case "X":
                 case "/":
                     setaValorAtualNaLista();
-                    if (btnResultFoiClicado) {
-                        exibeValorEmResultados("");
-                        btnResultadoFoiClicado(false);
-                    }
+                    VerificaSeBtnResultadoFoiClicado();
                     operacoes.setOperacao(operacaoRealizada);
                     setaValorImpresso(operacaoRealizada);
                     exibeValorEmOperacoes(retornaExpressao());
@@ -77,27 +79,32 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void VerificaSeBtnResultadoFoiClicado() {
+        if (btnResultFoiClicado) {
+            exibeValorEmResultados("");
+            btnResultadoFoiClicado(false);
+        }
+    }
+
     private void realizaFuncao(int idBotaoFuncao, String funcaoRealizada) {
         botao = findViewById(idBotaoFuncao);
         botao.setOnClickListener(
                 view -> {
                     switch (funcaoRealizada) {
                         case "C":
-                        case "CE":
-                            // Por enquanto deixarei a função Clear Entry Igual a Clear,
-                            // para futuramente implementar a função corretamente
                             LimpaTela();
                             exibeValorEmOperacoes(retornaExpressao());
                             exibeValorEmResultados(retornaExpressao());
                             break;
+                        case "CE":
+                            // Por enquanto deixarei a função Cancel Entry Igual a Clear,
+                            // para futuramente implementar a função corretamente
+                            CancelarEntrada();
+                            break;
 
                         case "+/-":
-                            int valor = operacoes.getValor(operacoes.returnSizeOfValue() - 1);
-                            if (valor > 0)
-                                valor = -valor;
-                            else
-                                valor = -valor;
-
+                            int valor = buscaValorImpresso();
+                            valor = InverteSinal(valor);
                             setaValorAtualNaLista();
                             LimpaTela();
                             exibeValorEmOperacoes(convert.toStr(valor));
@@ -107,31 +114,30 @@ public class MainActivity extends AppCompatActivity {
                             setaValorAtualNaLista();
                             int total = operacoes.getValor(0);
                             int j = 1;
-                            for (int i = 0; i < operacoes.returnSizeOfOperations(); i++) {
-                                for (int r = j; r < operacoes.returnSizeOfValue(); r++) {
-                                    if (operacoes.getOperacao(i).equals("+")) {
-                                        total = operacoes.soma(total, operacoes.getValor(r));
-                                        btnResultadoFoiClicado(true);
-                                        j = r+1;
-                                        break;
-                                    } else if (operacoes.getOperacao(i).equals("-")) {
-                                        total = operacoes.subtracao(total, operacoes.getValor(r));
-                                        btnResultadoFoiClicado(true);
-                                        j = r+1;
-                                        break;
-                                    } else if (operacoes.getOperacao(i).equals("X")) {
-                                        total = operacoes.multiplicacao(total, operacoes.getValor(r));
-                                        btnResultadoFoiClicado(true);
-                                        j = r+1;
-                                        break;
-                                    } else if (operacoes.getOperacao(i).equals("/")) {
-                                        total = operacoes.divisao(total, operacoes.getValor(r));
-                                        btnResultadoFoiClicado(true);
-                                        j = r+1;
-                                        break;
+                            for (int i = 0; i < operacoes.returnSizeOfOperations(); i++)
+                                label:for (int r = j; r < operacoes.returnSizeOfValue(); r++)
+                                    switch (operacoes.getOperacao(i)) {
+                                        case "+":
+                                            total = operacoes.soma(total, operacoes.getValor(r));
+                                            btnResultadoFoiClicado(true);
+                                            j = r + 1;
+                                            break label;
+                                        case "-":
+                                            total = operacoes.subtracao(total, operacoes.getValor(r));
+                                            btnResultadoFoiClicado(true);
+                                            j = r + 1;
+                                            break label;
+                                        case "X":
+                                            total = operacoes.multiplicacao(total, operacoes.getValor(r));
+                                            btnResultadoFoiClicado(true);
+                                            j = r + 1;
+                                            break label;
+                                        case "/":
+                                            total = operacoes.divisao(total, operacoes.getValor(r));
+                                            btnResultadoFoiClicado(true);
+                                            j = r + 1;
+                                            break label;
                                     }
-                                }
-                            }
                             exibeValorEmResultados(convert.toStr(total));
                             LimpaTela();
                             break;
@@ -140,14 +146,37 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    private void CancelarEntrada() {
+        valorImpresso.remove(valorImpresso.size()-1);
+        operacoes.removePorIDListaValores(operacoes.returnSizeOfValue()-1);
+        exibeValorEmOperacoes(retornaExpressao());
+
+    }
+
+    private int buscaValorImpresso() {
+        if (valorImpresso.size() > 1) {
+            String valor = "";
+            for (int i = 0; i < valorImpresso.size(); i++) {
+                valor += valorImpresso.get(i);
+            }
+            return convert.toInt(valor);
+        } else {
+            return convert.toInt(valorImpresso.get(0));
+        }
+    }
+
+    private int InverteSinal(int valor) {
+        return -valor;
+    }
+
+    private int getSizeOfValorImpresso() {
+        return valorImpresso.size();
+    }
 
     private void setaValorAtualNaLista() {
         String ValorAtual = "";
-        for (int i = 0; i < valorImpresso.size(); i++) {
-            if (valorImpresso.get(i).equals("+") || // Gambiarra para consertar depois
-                    valorImpresso.get(i).equals("-") ||
-                    valorImpresso.get(i).equals("/") ||
-                    valorImpresso.get(i).equals("X")) {
+        for (int i = 0; i < getSizeOfValorImpresso(); i++) {
+            if (listaOperacoes.contains(valorImpresso.get(i))) {
                 ValorAtual = "";
             } else {
                 ValorAtual += valorImpresso.get(i);
@@ -170,10 +199,9 @@ public class MainActivity extends AppCompatActivity {
 
     public String retornaExpressao() {
         String expressao = "";
-        for (int i = 0; i < valorImpresso.size(); i++) {
+        for (int i = 0; i < getSizeOfValorImpresso(); i++) {
             expressao += valorImpresso.get(i);
         }
-
         return expressao;
     }
 
@@ -186,7 +214,6 @@ public class MainActivity extends AppCompatActivity {
         TextView campoMostraOperacoes = findViewById(R.id.txtMostraOperacoes);
         campoMostraOperacoes.setText(valor);
     }
-
 
     private void exibeValorEmResultados(String valor) {
         TextView campoMostraResultado = findViewById(R.id.txtMostraResultado);

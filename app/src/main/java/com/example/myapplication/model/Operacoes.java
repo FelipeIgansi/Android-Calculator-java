@@ -11,10 +11,7 @@ public class Operacoes implements Serializable {
     private List<Integer> valor = new ArrayList<>();
     private List<String> operacao = new ArrayList<>();
 
-
-    public Operacoes() {
-    }
-
+    public Operacoes() {}
 
     public int soma(int totalAtual, int valorAtual) {
         return totalAtual + valorAtual;
@@ -36,6 +33,10 @@ public class Operacoes implements Serializable {
         this.valor.clear();
     }
 
+    public void limpaOperacao() {
+        operacao.clear();
+    }
+
     public int getValor(int id) {
         return valor.get(id);
     }
@@ -52,7 +53,6 @@ public class Operacoes implements Serializable {
         return operacao.get(id);
     }
 
-
     public void setValor(int numero) {
         valor.add(numero);
     }
@@ -61,17 +61,7 @@ public class Operacoes implements Serializable {
         this.operacao.add(operacao);
     }
 
-    public int buscaIdPelovalor(String valor) {
-        int id = 0;
-        for (int i = 0; i < operacao.size(); i++) {
-            if (operacao.get(i).equals(valor)) {
-                id = i;
-            }
-        }
-        return id;
-    }
-
-    public void limpaOperacao() {
-        operacao.clear();
+    public void removePorIDListaValores(int id){
+        this.valor.remove(id);
     }
 }

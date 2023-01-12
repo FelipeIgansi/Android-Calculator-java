@@ -8,7 +8,7 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/btn_ClearEntry"
+        android:id="@+id/btn_CancelEntry"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="2dp"
@@ -126,7 +126,7 @@
         app:layout_constraintEnd_toStartOf="@+id/btn_Nove"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_Sete"
-        app:layout_constraintTop_toBottomOf="@+id/btn_ClearEntry" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_CancelEntry" />
 
     <Button
         android:id="@+id/btn_Tres"
@@ -211,7 +211,7 @@
         android:textColor="@color/white"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/btn_Sete"
-        app:layout_constraintEnd_toStartOf="@+id/btn_ClearEntry"
+        app:layout_constraintEnd_toStartOf="@+id/btn_CancelEntry"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtMostraResultado"
@@ -356,7 +356,7 @@
         app:layout_constraintBottom_toTopOf="@+id/btn_Nove"
         app:layout_constraintEnd_toStartOf="@+id/btn_Divisao"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btn_ClearEntry"
+        app:layout_constraintStart_toEndOf="@+id/btn_CancelEntry"
         app:layout_constraintTop_toBottomOf="@+id/txtMostraResultado"
         app:layout_constraintVertical_bias="1.0" />
 
