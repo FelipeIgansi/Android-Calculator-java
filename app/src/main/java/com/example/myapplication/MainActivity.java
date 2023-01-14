@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.myapplication.model.Operacoes;
+import com.example.myapplication.model.Operation;
 import com.example.myapplication.util.Convert;
 
 import java.util.ArrayList;
@@ -18,215 +18,226 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final Set<String> listaOperacoes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("+", "-", "/", "X")));
-    private final Operacoes operacoes = new Operacoes();
+    private static final Set<String> listOperations = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("+", "-", "/", "X")));
+    private final Operation operations = new Operation();
     private final Convert convert = new Convert();
-    private final List<String> valorImpresso = new ArrayList<>();
-    private Button botao;
-    private boolean btnResultFoiClicado = false;
+    private final List<String> valueInScreen = new ArrayList<>();
+    private Button button;
+    private boolean btnResultClicked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        IniciaBotoes();
+        StartBottons();
 
     }
 
-    private void IniciaBotoes() {
-        setarValor(R.id.btn_Um, 1);
-        setarValor(R.id.btn_Dois, 2);
-        setarValor(R.id.btn_Tres, 3);
-        setarValor(R.id.btn_Quatro, 4);
-        setarValor(R.id.btn_Cinco, 5);
-        setarValor(R.id.btn_Seis, 6);
-        setarValor(R.id.btn_Sete, 7);
-        setarValor(R.id.btn_Oito, 8);
-        setarValor(R.id.btn_Nove, 9);
-        setarValor(R.id.btn_Zero, 0);
-        setarOperacao(R.id.btn_Soma, "+");
-        setarOperacao(R.id.btn_Subtracao, "-");
-        setarOperacao(R.id.btn_Multiplicacao, "X");
-        setarOperacao(R.id.btn_Divisao, "/");
-        realizaFuncao(R.id.btn_InverteSinal, "+/-");
-        realizaFuncao(R.id.btn_Resultado, "=");
-        realizaFuncao(R.id.btn_Clear, "C");
-        realizaFuncao(R.id.btn_CancelEntry, "CE");
+    private void StartBottons() {
+        setValue(R.id.btn_One, 1);
+        setValue(R.id.btn_Two, 2);
+        setValue(R.id.btn_Three, 3);
+        setValue(R.id.btn_Four, 4);
+        setValue(R.id.btn_Five, 5);
+        setValue(R.id.btn_Six, 6);
+        setValue(R.id.btn_Seven, 7);
+        setValue(R.id.btn_Eight, 8);
+        setValue(R.id.btn_Nine, 9);
+        setValue(R.id.btn_Zero, 0);
+        setOperation(R.id.btn_Sum, "+");
+        setOperation(R.id.btn_Subtraction, "-");
+        setOperation(R.id.btn_Multiplication, "X");
+        setOperation(R.id.btn_Division, "/");
+        setFunction(R.id.btn_InvertSignal, "+/-");
+        setFunction(R.id.btn_Result, "=");
+        setFunction(R.id.btn_Clear, "C");
+        setFunction(R.id.btn_CancelEntry, "CE");
     }
 
-    private void setarValor(int idBotao, int valor) {
-        botao = findViewById(idBotao);
-        botao.setOnClickListener(view -> setaValorImpresso(convert.toStr(valor)));
+    private void setValue(int idButton, int value) {
+        button = findViewById(idButton);
+        button.setOnClickListener(view -> setValueInScreen(convert.toStr(value)));
     }
 
-    private void setarOperacao(int idBotaoOperacao, String operacaoRealizada) {
-        botao = findViewById(idBotaoOperacao);
-        botao.setOnClickListener(view -> {
-            switch (operacaoRealizada) {
+    private void setOperation(int idButton, String inputOperation) {
+        button = findViewById(idButton);
+        button.setOnClickListener(view -> {
+            switch (inputOperation) {
                 case "+":
                 case "-":
                 case "X":
                 case "/":
-                    setaValorAtualNaLista();
-                    VerificaSeBtnResultadoFoiClicado();
-                    operacoes.setOperacao(operacaoRealizada);
-                    setaValorImpresso(operacaoRealizada);
-                    exibeValorEmOperacoes(retornaExpressao());
+//                    if (!(getValueInScreen(retornSizeOfValueInScreen() - 1).equals(verifyIfExistsInOperations(inputOperation)))) {
+                        setInListValue();
+//                    }
+                    VerifyIfBtnResultWasClicked();
+                    operations.setOperation(inputOperation);
+                    setValueInScreen(inputOperation);
+                    printInScreenOfOperations(returnExpression());
                     break;
             }
 
         });
     }
 
-    private void VerificaSeBtnResultadoFoiClicado() {
-        if (btnResultFoiClicado) {
-            exibeValorEmResultados("");
-            btnResultadoFoiClicado(false);
+    private String getValueInScreen(int i) {
+        return valueInScreen.get(i);
+    }
+
+    private boolean verifyIfExistsInOperations(String inputOperation) {
+        return listOperations.contains(inputOperation);
+    }
+
+    public int retornSizeOfValueInScreen() {
+        return valueInScreen.size();
+    }
+
+    private void VerifyIfBtnResultWasClicked() {
+        if (btnResultClicked) {
+            printInScreenOfResults("");
+            btnResultWasClicked(false);
         }
     }
 
-    private void realizaFuncao(int idBotaoFuncao, String funcaoRealizada) {
-        botao = findViewById(idBotaoFuncao);
-        botao.setOnClickListener(
+    private void setFunction(int idButton, String function) {
+        button = findViewById(idButton);
+        button.setOnClickListener(
                 view -> {
-                    switch (funcaoRealizada) {
+                    switch (function) {
                         case "C":
-                            LimpaTela();
-                            exibeValorEmOperacoes(retornaExpressao());
-                            exibeValorEmResultados(retornaExpressao());
+                            Clear();
+                            printInScreenOfOperations(returnExpression());
+                            printInScreenOfResults(returnExpression());
                             break;
                         case "CE":
                             // Por enquanto deixarei a função Cancel Entry Igual a Clear,
                             // para futuramente implementar a função corretamente
-                            CancelarEntrada();
+                            CancelEntry();
                             break;
 
                         case "+/-":
-                            int valor = buscaValorImpresso();
-                            valor = InverteSinal(valor);
-                            setaValorAtualNaLista();
-                            LimpaTela();
-                            exibeValorEmOperacoes(convert.toStr(valor));
+                            int value = getValueInScreen();
+                            value = InvertSignal(value);
+                            setInListValue();
+                            Clear();
+                            printInScreenOfOperations(convert.toStr(value));
                             break;
 
                         case "=":
-                            setaValorAtualNaLista();
-                            int total = operacoes.getValor(0);
+                            setInListValue();
+                            int total = operations.getValue(0);
                             int j = 1;
-                            for (int i = 0; i < operacoes.returnSizeOfOperations(); i++)
-                                label:for (int r = j; r < operacoes.returnSizeOfValue(); r++)
-                                    switch (operacoes.getOperacao(i)) {
+                            for (int i = 0; i < operations.returnSizeOfOperations(); i++)
+                                label:for (int r = j; r < operations.returnSizeOfValue(); r++)
+                                    switch (operations.getOperation(i)) {
                                         case "+":
-                                            total = operacoes.soma(total, operacoes.getValor(r));
-                                            btnResultadoFoiClicado(true);
+                                            total = operations.sum(total, operations.getValue(r));
+                                            btnResultWasClicked(true);
                                             j = r + 1;
                                             break label;
                                         case "-":
-                                            total = operacoes.subtracao(total, operacoes.getValor(r));
-                                            btnResultadoFoiClicado(true);
+                                            total = operations.subtraction(total, operations.getValue(r));
+                                            btnResultWasClicked(true);
                                             j = r + 1;
                                             break label;
                                         case "X":
-                                            total = operacoes.multiplicacao(total, operacoes.getValor(r));
-                                            btnResultadoFoiClicado(true);
+                                            total = operations.multiplication(total, operations.getValue(r));
+                                            btnResultWasClicked(true);
                                             j = r + 1;
                                             break label;
                                         case "/":
-                                            total = operacoes.divisao(total, operacoes.getValor(r));
-                                            btnResultadoFoiClicado(true);
+                                            total = operations.division(total, operations.getValue(r));
+                                            btnResultWasClicked(true);
                                             j = r + 1;
                                             break label;
                                     }
-                            exibeValorEmResultados(convert.toStr(total));
-                            LimpaTela();
+                            printInScreenOfResults(convert.toStr(total));
+                            Clear();
                             break;
 
                     }
                 });
     }
 
-    private void CancelarEntrada() {
-        label: for (int i = valorImpresso.size() - 1; i >= 0; i--) {
-            if (listaOperacoes.contains(valorImpresso.get(i))) {
-                for (int j = valorImpresso.size() - 1; j >= i; j--) {
-                    valorImpresso.remove(j);
-//                        operacoes.removePorIDListaValores(j);
+    private void CancelEntry() {
+        label:
+        for (int i = valueInScreen.size() - 1; i >= 0; i--) {
+            if (verifyIfExistsInOperations(getValueInScreen(i))) {
+                for (int j = valueInScreen.size() - 1; j >= i; j--) {
+                    valueInScreen.remove(j);
                 }
                 break label;
-            } else if (!(listaOperacoes.contains(valorImpresso.get(i))) && i == 0){
-                LimpaTela();
-
+            } else if (!verifyIfExistsInOperations(getValueInScreen(i)) && i == 0) {
+                Clear();
             }
         }
-
-        exibeValorEmOperacoes(retornaExpressao());
+        printInScreenOfOperations(returnExpression());
     }
 
-    private int buscaValorImpresso() {
-        if (valorImpresso.size() > 1) {
-            String valor = "";
-            for (int i = 0; i < valorImpresso.size(); i++) {
-                valor += valorImpresso.get(i);
+    private int getValueInScreen() {
+        if (valueInScreen.size() > 1) {
+            String value = "";
+            for (int i = 0; i < valueInScreen.size(); i++) {
+                value += getValueInScreen(i);
             }
-            return convert.toInt(valor);
+            return convert.toInt(value);
         } else {
-            return convert.toInt(valorImpresso.get(0));
+            return convert.toInt(getValueInScreen(0));
         }
     }
 
-    private int InverteSinal(int valor) {
-        return -valor;
+    private int InvertSignal(int value) {
+        return -value;
     }
 
-    private int getSizeOfValorImpresso() {
-        return valorImpresso.size();
+    private int getSizeOfValueInScreen() {
+        return valueInScreen.size();
     }
 
-    private void setaValorAtualNaLista() {
-        String ValorAtual = "";
-        for (int i = 0; i < getSizeOfValorImpresso(); i++) {
-            if (listaOperacoes.contains(valorImpresso.get(i))) {
-                ValorAtual = "";
+    private void setInListValue() {
+        String Value = "";
+        for (int i = 0; i < getSizeOfValueInScreen(); i++) {
+            if (verifyIfExistsInOperations(getValueInScreen(i))) {
+                Value = "";
             } else {
-                ValorAtual += valorImpresso.get(i);
-
+                Value += getValueInScreen(i);
             }
         }
-        operacoes.setValor(convert.toInt(ValorAtual));
+        operations.setValue(convert.toInt(Value));
     }
 
-    private void LimpaTela() {
-        valorImpresso.clear();
-        operacoes.limpaLista();
-        operacoes.limpaOperacao();
-        exibeValorEmOperacoes("");
+    private void Clear() {
+        valueInScreen.clear();
+        operations.clearListOfValues();
+        operations.clearOperations();
+        printInScreenOfOperations("");
     }
 
-    private void btnResultadoFoiClicado(boolean valor) {
-        btnResultFoiClicado = valor;
+    private void btnResultWasClicked(boolean value) {
+        btnResultClicked = value;
     }
 
-    public String retornaExpressao() {
-        String expressao = "";
-        for (int i = 0; i < getSizeOfValorImpresso(); i++) {
-            expressao += valorImpresso.get(i);
+    public String returnExpression() {
+        String expression = "";
+        for (int i = 0; i < getSizeOfValueInScreen(); i++) {
+            expression += getValueInScreen(i);
         }
-        return expressao;
+        return expression;
     }
 
-    private void setaValorImpresso(String valor) {
-        valorImpresso.add(valor);
-        exibeValorEmOperacoes(retornaExpressao());
+    private void setValueInScreen(String value) {
+        valueInScreen.add(value);
+        printInScreenOfOperations(returnExpression());
     }
 
-    private void exibeValorEmOperacoes(String valor) {
-        TextView campoMostraOperacoes = findViewById(R.id.txtMostraOperacoes);
-        campoMostraOperacoes.setText(valor);
+    private void printInScreenOfOperations(String value) {
+        TextView txtOperations = findViewById(R.id.txtPrintOperations);
+        txtOperations.setText(value);
     }
 
-    private void exibeValorEmResultados(String valor) {
-        TextView campoMostraResultado = findViewById(R.id.txtMostraResultado);
-        campoMostraResultado.setText(valor);
+    private void printInScreenOfResults(String value) {
+        TextView txtResults = findViewById(R.id.txtPrintResult);
+        txtResults.setText(value);
     }
 }
