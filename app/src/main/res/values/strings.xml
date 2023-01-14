@@ -31,6 +31,6 @@
     <string name="btn_NumSeven">7</string>
     <string name="btn_Result">=</string>
     <string name="btn_Clear">C</string>
-    <string name="txtPrintResult">Mostra Resultado</string>
-    <string name="txtPrintOperation">Mostra Operações</string>
+    <string name="txtPrintResult">Print Result</string>
+    <string name="txtPrintOperation">Print Operations</string>
 </resources>
