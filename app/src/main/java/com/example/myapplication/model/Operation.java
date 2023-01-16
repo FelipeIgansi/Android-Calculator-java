@@ -11,7 +11,8 @@ public class Operation implements Serializable {
     private List<Integer> value = new ArrayList<>();
     private List<String> operation = new ArrayList<>();
 
-    public Operation() {}
+    public Operation() {
+    }
 
     public int sum(int total, int value) {
         return total + value;
@@ -56,6 +57,25 @@ public class Operation implements Serializable {
     public void setValue(int number) {
         this.value.add(number);
     }
+    public boolean verifyIfValueListIsEmpty(){
+        if (this.value.size() < 1){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public void updateValue(int value) {
+        if (this.value.size() == 0) {
+            this.value.remove(0);
+            this.value.add(value);
+        } else if (this.value.size() > 0) {
+            this.value.remove(0);
+            this.value.add(value);
+        }
+    }
+
 
     public void setOperation(String operation) {
         this.operation.add(operation);

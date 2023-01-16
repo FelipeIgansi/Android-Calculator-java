@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final Set<String> listOperations = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("+", "-", "/", "X")));
+    private static final Set<String> listOperations = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("+", "-", "/", "x")));
     private final Operation operations = new Operation();
     private final Convert convert = new Convert();
     private final List<String> valueInScreen = new ArrayList<>();
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         setValue(R.id.btn_Zero, 0);
         setOperation(R.id.btn_Sum, "+");
         setOperation(R.id.btn_Subtraction, "-");
-        setOperation(R.id.btn_Multiplication, "X");
+        setOperation(R.id.btn_Multiplication, "x");
         setOperation(R.id.btn_Division, "/");
         setFunction(R.id.btn_InvertSignal, "+/-");
         setFunction(R.id.btn_Result, "=");
@@ -66,10 +66,10 @@ public class MainActivity extends AppCompatActivity {
             switch (inputOperation) {
                 case "+":
                 case "-":
-                case "X":
+                case "x":
                 case "/":
 //                    if (!(getValueInScreen(retornSizeOfValueInScreen() - 1).equals(verifyIfExistsInOperations(inputOperation)))) {
-                        setInListValue();
+                    setInListValue();
 //                    }
                     VerifyIfBtnResultWasClicked();
                     operations.setOperation(inputOperation);
@@ -119,8 +119,15 @@ public class MainActivity extends AppCompatActivity {
                         case "+/-":
                             int value = getValueInScreen();
                             value = InvertSignal(value);
-                            setInListValue();
-                            Clear();
+                            if (operations.verifyIfValueListIsEmpty()) {
+                                operations.setValue(value);
+                                updateValueInScreen(convert.toStr(value));
+                            }else {
+                                operations.updateValue(value);
+                                updateValueInScreen(convert.toStr(value));
+                            }
+
+//                            Clear();
                             printInScreenOfOperations(convert.toStr(value));
                             break;
 
@@ -141,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                                             btnResultWasClicked(true);
                                             j = r + 1;
                                             break label;
-                                        case "X":
+                                        case "x":
                                             total = operations.multiplication(total, operations.getValue(r));
                                             btnResultWasClicked(true);
                                             j = r + 1;
@@ -158,6 +165,16 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    private void updateValueInScreen(String value) {
+        if (valueInScreen.size() == 0) {
+            valueInScreen.add(value);
+        } else if (valueInScreen.size() > 0) {
+            Clear();
+            valueInScreen.add(value);
+
+        }
     }
 
     private void CancelEntry() {
