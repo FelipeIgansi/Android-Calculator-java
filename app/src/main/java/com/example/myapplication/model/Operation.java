@@ -46,6 +46,10 @@ public class Operation implements Serializable {
         return this.value.size();
     }
 
+    public List<String> retornListOperations(){
+        return this.operation;
+    }
+
     public int returnSizeOfOperations() {
         return this.operation.size();
     }
@@ -68,7 +72,6 @@ public class Operation implements Serializable {
 
     public void updateValue(int value) {
         if (this.value.size() == 0) {
-            this.value.remove(0);
             this.value.add(value);
         } else if (this.value.size() > 0) {
             this.value.remove(0);
