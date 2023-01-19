@@ -13,11 +13,23 @@ import com.example.myapplication.util.Convert;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final Set<String> listOperations = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("+", "-", "/", "x", "%")));
+    private static final Set<String> listOperations;
+
+    static {
+        listOperations = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+                Pattern.quote("+"),
+                Pattern.quote("-"),
+                "/",
+                "x",
+                "%")));
+    }
+
     private final Operation operations = new Operation();
     private final Convert convert = new Convert();
     public String valueInScreen = "";
@@ -67,10 +79,9 @@ public class MainActivity extends AppCompatActivity {
                 case "-":
                 case "x":
                 case "/":
-                    setInListValue();
+                    setValueInScreen(inputOperation);
                     VerifyIfBtnResultWasClicked();
                     operations.setOperation(inputOperation);
-                    setValueInScreen(inputOperation);
                     printInScreenOfOperations(returnExpression());
                     break;
             }
@@ -133,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
                                 updateValueInScreen(convert.toStr(value));
                             }
 
-//                            Clear();
                             printInScreenOfOperations(convert.toStr(value));
                             break;
 
@@ -166,7 +176,8 @@ public class MainActivity extends AppCompatActivity {
                                             break label;
                                     }
                             printInScreenOfResults(convert.toStr(total));
-                            Clear();
+                            valueInScreen = convert.toStr(total);
+//                            Clear();
                             break;
 
                     }
@@ -174,14 +185,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private String getValueInScreen(int i) {
-        String[] value = splitValueInScreen();
-        return value[value.length];
-    }
-
+/*
     private boolean verifyIfExistsInOperations(String inputOperation) {
         return listOperations.contains(inputOperation);
     }
+*/
 
     private void VerifyIfBtnResultWasClicked() {
         if (btnResultClicked) {
@@ -192,26 +200,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateValueInScreen(String value) {
         String[] Value = splitValueInScreen();
-        if (Value.length == 0) {
-            valueInScreen += value;
-        } else if (Value.length > 0) {
+        if (Value.length != 0) {
             Clear();
-            valueInScreen += value;
-
         }
+        valueInScreen += value;
     }
 
     private void CancelEntry() {
         String[] values = splitValueInScreen();
-
-        values[values.length - 1] = "";
-        for (String operation : operations.retornListOperations()) {
-            for (String value : values) {
-                valueInScreen = value;
-                valueInScreen += operation;
-                break;
-            }
-        }
+        values[values.length-1] = "";
         printInScreenOfOperations(returnExpression());
     }
 
@@ -220,13 +217,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setInListValue() {
-        String[] value = splitValueInScreen();
-        operations.setValue(convert.toInt(value[value.length - 1]));
+        String[] values = splitValueInScreen();
+        operations.clearListOfValues();
+        for (String value : values) {
+            operations.setValue(convert.toInt(value));
+        }
+
     }
 
     @NonNull
     private String[] splitValueInScreen() {
-        String[] values = new String[0];
+        //Arrumar depois não está separando a string quando tem "-", apenas setando manualmente o
+        // valor ou diminuindo a quantidade de itens na lista de operadores
+        String[] values;
         values = valueInScreen.split(String.valueOf(listOperations));
         return values;
     }
