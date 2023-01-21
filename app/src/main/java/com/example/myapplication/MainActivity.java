@@ -94,6 +94,16 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(
                 view -> {
                     switch (function) {
+                        case "C":
+                            Clear();
+                            printInScreenOfOperations(returnExpression());
+                            printInScreenOfResults(returnExpression());
+                            break;
+
+                        case "CE":
+                            CancelEntry();
+                            break;
+
                         case "%":
                             setInListValue();
                             /*if (operations.returnSizeOfValue() > 1) {
@@ -124,14 +134,7 @@ public class MainActivity extends AppCompatActivity {
                             }*/
 
                             break;
-                        case "C":
-                            Clear();
-                            printInScreenOfOperations(returnExpression());
-                            printInScreenOfResults(returnExpression());
-                            break;
-                        case "CE":
-                            CancelEntry();
-                            break;
+
                         case "+/-":
                             setInListValue();
                             int value = operations.getValue(operations.returnSizeOfValue() - 1);
@@ -176,20 +179,13 @@ public class MainActivity extends AppCompatActivity {
                                             break label;
                                     }
                             printInScreenOfResults(convert.toStr(total));
-                            valueInScreen = convert.toStr(total);
+                            valueInScreen = "0";
 //                            Clear();
                             break;
 
                     }
                 });
     }
-
-
-/*
-    private boolean verifyIfExistsInOperations(String inputOperation) {
-        return listOperations.contains(inputOperation);
-    }
-*/
 
     private void VerifyIfBtnResultWasClicked() {
         if (btnResultClicked) {
@@ -207,9 +203,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void CancelEntry() {
-        String[] values = splitValueInScreen();
-        values[values.length-1] = "";
-        printInScreenOfOperations(returnExpression());
+        valueInScreen = (valueInScreen.substring(0, valueInScreen.length() - 1));
+        printInScreenOfOperations(valueInScreen);
+    }
+
+    private void Clear() {
+        valueInScreen = "";
+        operations.clearListOfValues();
+        operations.clearOperations();
+        printInScreenOfOperations("");
     }
 
     private int InvertSignal(int value) {
@@ -227,19 +229,11 @@ public class MainActivity extends AppCompatActivity {
 
     @NonNull
     private String[] splitValueInScreen() {
-        //Arrumar depois não está separando a string quando tem "-", apenas setando manualmente o
-        // valor ou diminuindo a quantidade de itens na lista de operadores
         String[] values;
         values = valueInScreen.split(String.valueOf(listOperations));
         return values;
     }
 
-    private void Clear() {
-        valueInScreen = "";
-        operations.clearListOfValues();
-        operations.clearOperations();
-        printInScreenOfOperations("");
-    }
 
     private void btnResultWasClicked(boolean value) {
         btnResultClicked = value;
