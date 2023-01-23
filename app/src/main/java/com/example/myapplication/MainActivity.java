@@ -25,8 +25,8 @@ public class MainActivity extends AppCompatActivity {
         listOperations = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
                 Pattern.quote("+"),
                 Pattern.quote("-"),
-                "/",
-                "x",
+                Pattern.quote("/"),
+                Pattern.quote("x"),
                 "%")));
     }
 
@@ -102,37 +102,35 @@ public class MainActivity extends AppCompatActivity {
 
                         case "CE":
                             CancelEntry();
+                            printInScreenOfOperations(returnExpression());
                             break;
 
                         case "%":
                             setInListValue();
-                            /*if (operations.returnSizeOfValue() > 1) {
-                                for (int i = operations.returnSizeOfValue() - 1; i > 0; i--) {
-                                    int LastValue = operations.getValue(i);
-                                    for (int j = valueInScreen.size() - 1; j < 0; j++) {
-                                        for (int k = operations.returnSizeOfOperations() - 1; k > 0; k++) {
-                                            if (valueInScreen.get(i).equals(listOperations.contains(k))
-                                            {
-
-                                            }
-                                        }
-                                    }
-                                    valueInScreen.remove(operations.getValue(i));
-                                    switch (operations.getOperation(i - 1)) {
-                                        case "+":
-                                        case "-":
-                                            valueInScreen.add(convert.toStr(LastValue * 100));
-                                            printInScreenOfOperations(returnExpression());
-                                            break;
-                                        case "x":
-                                        case "/":
-                                            valueInScreen.add(convert.toStr(operations.getValue(i) * LastValue * 100));
-                                            printInScreenOfOperations(returnExpression());
-                                            break;
-                                    }
+                            double totalPercent = 0;
+                            if (operations.returnSizeOfValue() >= 2) {
+                                switch (operations.getOperation(0)){
+                                    case "+":
+                                    case "-":
+                                        double a1 = operations.getValue(1);
+                                        double a2 = (a1 /100);
+                                        totalPercent = (operations.getValue(0) * (a2));
+                                        totalPercent = (int) totalPercent;
+                                        break;
+                                    case "x":
+                                    case "/":
+                                        a1 = operations.getValue(1);
+                                        a2 = (a1 /100);
+                                        totalPercent = (a2);
+                                        break;
                                 }
-                            }*/
-
+                                CancelEntry();
+                                valueInScreen += totalPercent;
+                            }
+                            else {
+                                valueInScreen = "0";
+                            }
+                            printInScreenOfOperations(returnExpression());
                             break;
 
                         case "+/-":
@@ -203,8 +201,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void CancelEntry() {
-        valueInScreen = (valueInScreen.substring(0, valueInScreen.length() - 1));
-        printInScreenOfOperations(valueInScreen);
+        if (!valueInScreen.isEmpty()) {
+            for (int i = valueInScreen.length()-1; i > 0; i--) {
+                char a = valueInScreen.charAt(i);
+                System.out.println(a);
+                if ((listOperations.contains(Pattern.quote(Character.toString(valueInScreen.charAt(i)))))){
+                    valueInScreen = (valueInScreen.substring(0, i+1));
+                    break;
+                }
+            }
+        }
     }
 
     private void Clear() {

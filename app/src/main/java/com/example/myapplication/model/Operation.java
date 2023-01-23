@@ -8,8 +8,8 @@ import java.util.List;
 
 public class Operation implements Serializable {
     @NonNull
-    private List<Integer> value = new ArrayList<>();
-    private List<String> operation = new ArrayList<>();
+    private final List<Integer> value = new ArrayList<>();
+    private final List<String> operation = new ArrayList<>();
 
     public Operation() {
     }
@@ -73,8 +73,8 @@ public class Operation implements Serializable {
     public void updateValue(int value) {
         if (this.value.size() == 0) {
             this.value.add(value);
-        } else if (this.value.size() > 0) {
-            this.value.remove(0);
+        } else {
+            this.value.remove(returnSizeOfValue()-1);
             this.value.add(value);
         }
     }
