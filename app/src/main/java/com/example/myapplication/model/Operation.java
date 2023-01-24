@@ -8,25 +8,25 @@ import java.util.List;
 
 public class Operation implements Serializable {
     @NonNull
-    private final List<Integer> value = new ArrayList<>();
+    private final List<String> value = new ArrayList<>();
     private final List<String> operation = new ArrayList<>();
 
     public Operation() {
     }
 
-    public int sum(int total, int value) {
+    public double sum(double total, double value) {
         return total + value;
     }
 
-    public int subtraction(int total, int value) {
+    public double subtraction(double total, double value) {
         return total - value;
     }
 
-    public int division(int total, int value) {
+    public double division(double total, double value) {
         return total / value;
     }
 
-    public int multiplication(int total, int value) {
+    public double multiplication(double total, double value) {
         return total * value;
     }
 
@@ -38,16 +38,12 @@ public class Operation implements Serializable {
         this.operation.clear();
     }
 
-    public int getValue(int id) {
+    public String getValue(int id) {
         return this.value.get(id);
     }
 
     public int returnSizeOfValue() {
         return this.value.size();
-    }
-
-    public List<String> retornListOperations(){
-        return this.operation;
     }
 
     public int returnSizeOfOperations() {
@@ -58,7 +54,7 @@ public class Operation implements Serializable {
         return this.operation.get(id);
     }
 
-    public void setValue(int number) {
+    public void setValue(String number) {
         this.value.add(number);
     }
     public boolean verifyIfValueListIsEmpty(){
@@ -70,7 +66,7 @@ public class Operation implements Serializable {
         }
     }
 
-    public void updateValue(int value) {
+    public void updateValue(String value) {
         if (this.value.size() == 0) {
             this.value.add(value);
         } else {

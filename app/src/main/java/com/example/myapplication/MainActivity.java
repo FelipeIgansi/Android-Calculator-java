@@ -3,17 +3,13 @@ package com.example.myapplication;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.myapplication.model.Operation;
 import com.example.myapplication.util.Convert;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -41,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        StartBottons();
+        StartButtons();
     }
 
-    private void StartBottons() {
+    private void StartButtons() {
         setValue(R.id.btn_One, 1);
         setValue(R.id.btn_Two, 2);
         setValue(R.id.btn_Three, 3);
@@ -68,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setValue(int idButton, int value) {
         button = findViewById(idButton);
-        button.setOnClickListener(view -> setValueInScreen(convert.toStr(value)));
+        button.setOnClickListener(view -> setValueInScreen(convert.IntToStr(value)));
     }
 
     private void setOperation(int idButton, String inputOperation) {
@@ -108,20 +104,15 @@ public class MainActivity extends AppCompatActivity {
                         case "%":
                             setInListValue();
                             double totalPercent = 0;
-                            if (operations.returnSizeOfValue() >= 2) {
-                                switch (operations.getOperation(0)){
+                            if (getSize_ListOperations() >= 2) {
+                                switch (getValue_ListOperations(0)){
                                     case "+":
                                     case "-":
-                                        double a1 = operations.getValue(1);
-                                        double a2 = (a1 /100);
-                                        totalPercent = (operations.getValue(0) * (a2));
-                                        totalPercent = (int) totalPercent;
+                                        totalPercent = convert.StrToInt(getValue_ListValue(getSize_ListValue()-2)) * getPercent();
                                         break;
                                     case "x":
                                     case "/":
-                                        a1 = operations.getValue(1);
-                                        a2 = (a1 /100);
-                                        totalPercent = (a2);
+                                        totalPercent = getPercent();
                                         break;
                                 }
                                 CancelEntry();
@@ -135,54 +126,76 @@ public class MainActivity extends AppCompatActivity {
 
                         case "+/-":
                             setInListValue();
-                            int value = operations.getValue(operations.returnSizeOfValue() - 1);
+                            int value = convert.StrToInt(getValue_ListValue(getSize_ListValue()));
                             value = InvertSignal(value);
                             if (operations.verifyIfValueListIsEmpty()) {
-                                operations.setValue(value);
-                                updateValueInScreen(convert.toStr(value));
+                                operations.setValue(convert.IntToStr(value));
+                                updateValueInScreen(convert.IntToStr(value));
                             } else {
-                                operations.updateValue(value);
-                                updateValueInScreen(convert.toStr(value));
+                                operations.updateValue(convert.IntToStr(value));
+                                updateValueInScreen(convert.IntToStr(value));
                             }
 
-                            printInScreenOfOperations(convert.toStr(value));
+                            printInScreenOfOperations(convert.IntToStr(value));
                             break;
 
                         case "=":
                             setInListValue();
-                            int total = operations.getValue(0);
+                            Double total = convert.StrToDouble(getValue_ListValue(0));
                             int j = 1;
                             for (int i = 0; i < operations.returnSizeOfOperations(); i++)
-                                label:for (int r = j; r < operations.returnSizeOfValue(); r++)
-                                    switch (operations.getOperation(i)) {
+                                label:for (int r = j; r < getSize_ListOperations(); r++)
+                                    switch (getValue_ListOperations(i)) {
                                         case "+":
-                                            total = operations.sum(total, operations.getValue(r));
+                                            total = operations.sum(total, convert.StrToDouble(getValue_ListValue(r)));
                                             btnResultWasClicked(true);
                                             j = r + 1;
                                             break label;
                                         case "-":
-                                            total = operations.subtraction(total, operations.getValue(r));
+                                            total = operations.subtraction(total, convert.StrToDouble(getValue_ListValue(r)));
                                             btnResultWasClicked(true);
                                             j = r + 1;
                                             break label;
                                         case "x":
-                                            total = operations.multiplication(total, operations.getValue(r));
+                                            total = operations.multiplication(total, convert.StrToDouble(getValue_ListValue(r)));
                                             btnResultWasClicked(true);
                                             j = r + 1;
                                             break label;
                                         case "/":
-                                            total = operations.division(total, operations.getValue(r));
+                                            total = operations.division(total, convert.StrToDouble(getValue_ListValue(r)));
                                             btnResultWasClicked(true);
                                             j = r + 1;
                                             break label;
                                     }
-                            printInScreenOfResults(convert.toStr(total));
-                            valueInScreen = "0";
-//                            Clear();
+                            if (!(total < 0))
+                                printInScreenOfResults(convert.IntToStr(total.intValue()));
+                            else
+                                printInScreenOfResults(convert.DoubleToStr(total));
+                            Clear();
                             break;
 
                     }
                 });
+    }
+
+    private double getPercent() {
+        return convert.StrToDouble(getValue_ListValue(getSize_ListValue() - 1)) / 100;
+    }
+
+    private String getValue_ListOperations(int id) {
+        return operations.getOperation(id);
+    }
+
+    private int getSize_ListOperations() {
+        return operations.returnSizeOfValue();
+    }
+
+    private String getValue_ListValue(int id) {
+        return operations.getValue(id);
+    }
+
+    private int getSize_ListValue() {
+        return getSize_ListOperations();
     }
 
     private void VerifyIfBtnResultWasClicked() {
@@ -228,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
         String[] values = splitValueInScreen();
         operations.clearListOfValues();
         for (String value : values) {
-            operations.setValue(convert.toInt(value));
+            operations.setValue(value);
         }
 
     }
@@ -239,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
         values = valueInScreen.split(String.valueOf(listOperations));
         return values;
     }
-
 
     private void btnResultWasClicked(boolean value) {
         btnResultClicked = value;

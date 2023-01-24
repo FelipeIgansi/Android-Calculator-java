@@ -1,16 +1,19 @@
 package com.example.myapplication.util;
 
 public class Convert {
-    public int toInt(String str){
+    public int StrToInt(String str){
         if(str.equals("")){
             return 0;
         }
         return Integer.parseInt(str);
     }
-    public int DoubleToInt(Double valor)  {
-        return (int) Math.abs(valor);
+    public double StrToDouble(String valor){
+        return Double.parseDouble(valor);
     }
-    public String toStr(int valor){
+    public String DoubleToStr(double valor){
+        return Double.toString(valor);
+    }
+    public String IntToStr(int valor){
         return Integer.toString(valor);
     }
 
