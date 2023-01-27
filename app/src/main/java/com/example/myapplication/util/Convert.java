@@ -7,6 +7,12 @@ public class Convert {
         }
         return Integer.parseInt(str);
     }
+    public long StrToLong(String str){
+        if(str.equals("")){
+            return 0;
+        }
+        return Long.parseLong(str);
+    }
     public double StrToDouble(String valor){
         return Double.parseDouble(valor);
     }

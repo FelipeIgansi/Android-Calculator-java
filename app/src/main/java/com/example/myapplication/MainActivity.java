@@ -3,13 +3,18 @@ package com.example.myapplication;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.myapplication.model.Operation;
 import com.example.myapplication.util.Convert;
+
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -23,7 +28,8 @@ public class MainActivity extends AppCompatActivity {
                 Pattern.quote("-"),
                 Pattern.quote("/"),
                 Pattern.quote("x"),
-                "%")));
+                Pattern.quote("%"),
+                Pattern.quote("="))));
     }
 
     private final Operation operations = new Operation();
@@ -31,6 +37,11 @@ public class MainActivity extends AppCompatActivity {
     public String valueInScreen = "";
     private Button button;
     private boolean btnResultClicked = false;
+    private Locale localeBR = new Locale("pt", "br");
+
+    private NumberFormat numberFormat = NumberFormat.getNumberInstance(localeBR);
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,10 +116,10 @@ public class MainActivity extends AppCompatActivity {
                             setInListValue();
                             double totalPercent = 0;
                             if (getSize_ListOperations() >= 2) {
-                                switch (getValue_ListOperations(0)){
+                                switch (getValue_ListOperations(0)) {
                                     case "+":
                                     case "-":
-                                        totalPercent = convert.StrToInt(getValue_ListValue(getSize_ListValue()-2)) * getPercent();
+                                        totalPercent = convert.StrToInt(getValue_ListValue(getSize_ListValue() - 2)) * getPercent();
                                         break;
                                     case "x":
                                     case "/":
@@ -117,8 +128,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 CancelEntry();
                                 valueInScreen += totalPercent;
-                            }
-                            else {
+                            } else {
                                 valueInScreen = "0";
                             }
                             printInScreenOfOperations(returnExpression());
@@ -215,11 +225,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void CancelEntry() {
         if (!valueInScreen.isEmpty()) {
-            for (int i = valueInScreen.length()-1; i > 0; i--) {
+            for (int i = valueInScreen.length() - 1; i > 0; i--) {
                 char a = valueInScreen.charAt(i);
                 System.out.println(a);
-                if ((listOperations.contains(Pattern.quote(Character.toString(valueInScreen.charAt(i)))))){
-                    valueInScreen = (valueInScreen.substring(0, i+1));
+                if ((listOperations.contains(Pattern.quote(Character.toString(valueInScreen.charAt(i)))))) {
+                    valueInScreen = (valueInScreen.substring(0, i + 1));
                     break;
                 }
             }
@@ -262,9 +272,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setValueInScreen(String value) {
-        valueInScreen += value;
-        printInScreenOfOperations(returnExpression());
+        if (listOperations.contains(Pattern.quote(value)) && !(valueInScreen.equals(""))) {
+            if (isLastElementAOperator()) {
+                replaceLastValueInScreenIfIsAOperator(value);
+            }
+            else {
+                valueInScreen += value;
+            }
+        }else {
+            valueInScreen += value;
+        }
+        String[] listValues = splitValueInScreen();
+        printInScreenOfOperations(formatValue(listValues[listValues.length-1]));
+
+//        printIn ScreenOfOperations(numberFormat.format(convert.StrToLong(valueInScreen)));
+
+        if (listValues.length-1 > 18) {
+            Clear();
+        }
+
     }
+
+    public void replaceLastValueInScreenIfIsAOperator(String value) {
+        valueInScreen = valueInScreen.substring(0, valueInScreen.length() - 1) + value;
+    }
+
+    private boolean isLastElementAOperator() {
+        return listOperations.contains(Pattern.quote(Character.toString(valueInScreen.charAt(valueInScreen.length() - 1))));
+    }
+
+    public String formatValue(String value) {
+        return numberFormat.format(convert.StrToLong(value));
+    }
+
 
     private void printInScreenOfOperations(String value) {
         TextView txtOperations = findViewById(R.id.txtPrintOperations);
