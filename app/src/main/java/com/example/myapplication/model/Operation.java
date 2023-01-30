@@ -68,10 +68,18 @@ public class Operation implements Serializable {
 
     public void updateValue(String value) {
         if (this.value.size() == 0) {
-            this.value.add(value);
+            setValue(value);
         } else {
             this.value.remove(returnSizeOfValue()-1);
             this.value.add(value);
+        }
+    }
+    public void updateOperation(String value) {
+        if (this.operation.size() == 0) {
+            setOperation(value);
+        } else {
+            this.operation.remove(returnSizeOfOperations()-1);
+            this.operation.add(value);
         }
     }
 

@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     private NumberFormat numberFormat = NumberFormat.getNumberInstance(localeBR);
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,9 +85,14 @@ public class MainActivity extends AppCompatActivity {
                 case "-":
                 case "x":
                 case "/":
-                    setValueInScreen(inputOperation);
                     VerifyIfBtnResultWasClicked();
-                    operations.setOperation(inputOperation);
+                    setValueInScreen(inputOperation);
+                    if (listOperations.contains(Pattern.quote(retornLastCaracter_ListValue()))) {
+                        operations.updateOperation(inputOperation);
+                    }else {
+                        operations.setOperation(inputOperation);
+
+                    }
                     printInScreenOfOperations(returnExpression());
                     break;
             }
@@ -178,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                                             break label;
                                     }
                             if (!(total < 0))
-                                printInScreenOfResults(convert.IntToStr(total.intValue()));
+                                printInScreenOfResults(formatValue(convert.IntToStr(total.intValue())));
                             else
                                 printInScreenOfResults(convert.DoubleToStr(total));
                             Clear();
@@ -271,25 +275,28 @@ public class MainActivity extends AppCompatActivity {
         return valueInScreen;
     }
 
+    private String retornLastCaracter_ListValue(){
+        return Character.toString(valueInScreen.charAt(valueInScreen.length()-1));
+    }
     private void setValueInScreen(String value) {
         if (listOperations.contains(Pattern.quote(value)) && !(valueInScreen.equals(""))) {
             if (isLastElementAOperator()) {
                 replaceLastValueInScreenIfIsAOperator(value);
-            }
-            else {
+            } else {
                 valueInScreen += value;
             }
-        }else {
-            valueInScreen += value;
+            printInScreenOfOperations(returnExpression());
+        } else {
+            if (!(listOperations.contains(Pattern.quote(value)))) {
+                valueInScreen += value;
+                String[] listValues = splitValueInScreen();
+                printInScreenOfOperations(formatValue(listValues[listValues.length-1]));
+            }
         }
-        String[] listValues = splitValueInScreen();
-        printInScreenOfOperations(formatValue(listValues[listValues.length-1]));
 
-//        printIn ScreenOfOperations(numberFormat.format(convert.StrToLong(valueInScreen)));
-
-        if (listValues.length-1 > 18) {
+ /*       if (listValues.length - 1 > 18) {
             Clear();
-        }
+        }*/
 
     }
 
