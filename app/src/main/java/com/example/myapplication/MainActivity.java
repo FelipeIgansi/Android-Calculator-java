@@ -85,16 +85,17 @@ public class MainActivity extends AppCompatActivity {
                 case "-":
                 case "x":
                 case "/":
-                    VerifyIfBtnResultWasClicked();
-                    setValueInScreen(inputOperation);
-                    if (listOperations.contains(Pattern.quote(retornLastCaracter_ListValue()))) {
-                        operations.updateOperation(inputOperation);
-                    }else {
-                        operations.setOperation(inputOperation);
-
+                    if (!(valueInScreen.equals(""))) {
+                        VerifyIfBtnResultWasClicked();
+                        if (listOperations.contains(Pattern.quote(retornLastCaracter_ListValue()))) {
+                            operations.updateOperation(inputOperation);
+                        } else {
+                            operations.setOperation(inputOperation);
+                        }
+                        setValueInScreen(inputOperation);
+                        printInScreenOfOperations(returnExpression());
+                        break;
                     }
-                    printInScreenOfOperations(returnExpression());
-                    break;
             }
 
         });
@@ -114,82 +115,95 @@ public class MainActivity extends AppCompatActivity {
                         case "CE":
                             CancelEntry();
                             printInScreenOfOperations(returnExpression());
+                            printInScreenOfResults("");
                             break;
 
                         case "%":
-                            setInListValue();
-                            double totalPercent = 0;
-                            if (getSize_ListOperations() >= 2) {
-                                switch (getValue_ListOperations(0)) {
-                                    case "+":
-                                    case "-":
-                                        totalPercent = convert.StrToInt(getValue_ListValue(getSize_ListValue() - 2)) * getPercent();
-                                        break;
-                                    case "x":
-                                    case "/":
-                                        totalPercent = getPercent();
-                                        break;
+                            if (!(valueInScreen.equals(""))) {
+                                setInListValue();
+                                double totalPercent = 0;
+                                if (getSize_ListOperations() >= 2) {
+                                    switch (getValue_ListOperations(0)) {
+                                        case "+":
+                                        case "-":
+                                            totalPercent = convert.StrToInt(getValue_ListValue(getSize_ListValue() - 2)) * getPercent();
+                                            break;
+                                        case "x":
+                                        case "/":
+                                            totalPercent = getPercent();
+                                            break;
+                                    }
+                                    CancelEntry();
+                                    valueInScreen += totalPercent;
+                                } else {
+                                    valueInScreen = "0";
                                 }
-                                CancelEntry();
-                                valueInScreen += totalPercent;
-                            } else {
-                                valueInScreen = "0";
+                                printInScreenOfOperations(returnExpression());
+                                break;
                             }
-                            printInScreenOfOperations(returnExpression());
-                            break;
 
                         case "+/-":
-                            setInListValue();
-                            int value = convert.StrToInt(getValue_ListValue(getSize_ListValue()));
-                            value = InvertSignal(value);
-                            if (operations.verifyIfValueListIsEmpty()) {
-                                operations.setValue(convert.IntToStr(value));
-                                updateValueInScreen(convert.IntToStr(value));
-                            } else {
-                                operations.updateValue(convert.IntToStr(value));
-                                updateValueInScreen(convert.IntToStr(value));
+                            if (!(valueInScreen.equals(""))) {
+                                setInListValue();
+                                int value = convert.StrToInt(getValue_ListValue(getSize_ListValue()));
+                                value = InvertSignal(value);
+                                if (operations.verifyIfValueListIsEmpty()) {
+                                    operations.setValue(convert.IntToStr(value));
+                                    updateValueInScreen(convert.IntToStr(value));
+                                } else {
+                                    operations.updateValue(convert.IntToStr(value));
+                                    updateValueInScreen(convert.IntToStr(value));
+                                }
+
+                                printInScreenOfOperations(convert.IntToStr(value));
+                                break;
                             }
 
-                            printInScreenOfOperations(convert.IntToStr(value));
-                            break;
-
                         case "=":
-                            setInListValue();
-                            Double total = convert.StrToDouble(getValue_ListValue(0));
-                            int j = 1;
-                            for (int i = 0; i < operations.returnSizeOfOperations(); i++)
-                                label:for (int r = j; r < getSize_ListOperations(); r++)
-                                    switch (getValue_ListOperations(i)) {
-                                        case "+":
-                                            total = operations.sum(total, convert.StrToDouble(getValue_ListValue(r)));
-                                            btnResultWasClicked(true);
-                                            j = r + 1;
-                                            break label;
-                                        case "-":
-                                            total = operations.subtraction(total, convert.StrToDouble(getValue_ListValue(r)));
-                                            btnResultWasClicked(true);
-                                            j = r + 1;
-                                            break label;
-                                        case "x":
-                                            total = operations.multiplication(total, convert.StrToDouble(getValue_ListValue(r)));
-                                            btnResultWasClicked(true);
-                                            j = r + 1;
-                                            break label;
-                                        case "/":
-                                            total = operations.division(total, convert.StrToDouble(getValue_ListValue(r)));
-                                            btnResultWasClicked(true);
-                                            j = r + 1;
-                                            break label;
-                                    }
-                            if (!(total < 0))
-                                printInScreenOfResults(formatValue(convert.IntToStr(total.intValue())));
-                            else
-                                printInScreenOfResults(convert.DoubleToStr(total));
-                            Clear();
-                            break;
-
+                            if (!(valueInScreen.equals(""))) {
+                                setInListValue();
+                                Double total = convert.StrToDouble(getValue_ListValue(0));
+                                total = getTotal(total);
+                                if (!(total < 0)) {
+                                    printInScreenOfResults(formatValue(convert.IntToStr(total.intValue())));
+                                } else {
+                                    printInScreenOfResults(convert.DoubleToStr(total));
+                                }
+                                btnResultWasClicked(true);
+                                valueInScreen = formatValue(convert.IntToStr(total.intValue()));
+                                operations.clearOperations();
+                                break;
+                            }
                     }
                 });
+    }
+
+    private Double getTotal(Double total) {
+        int j = 1;
+        for (int i = 0; i < operations.returnSizeOfOperations(); i++) {
+            label:
+            for (int r = j; r < getSize_ListOperations(); r++) {
+                switch (getValue_ListOperations(i)) {
+                    case "+":
+                        total = operations.sum(total, convert.StrToDouble(getValue_ListValue(r)));
+                        j = r + 1;
+                        break label;
+                    case "-":
+                        total = operations.subtraction(total, convert.StrToDouble(getValue_ListValue(r)));
+                        j = r + 1;
+                        break label;
+                    case "x":
+                        total = operations.multiplication(total, convert.StrToDouble(getValue_ListValue(r)));
+                        j = r + 1;
+                        break label;
+                    case "/":
+                        total = operations.division(total, convert.StrToDouble(getValue_ListValue(r)));
+                        j = r + 1;
+                        break label;
+                }
+            }
+        }
+        return total;
     }
 
     private double getPercent() {
@@ -245,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
         operations.clearListOfValues();
         operations.clearOperations();
         printInScreenOfOperations("");
+        printInScreenOfResults("");
     }
 
     private int InvertSignal(int value) {
@@ -275,10 +290,12 @@ public class MainActivity extends AppCompatActivity {
         return valueInScreen;
     }
 
-    private String retornLastCaracter_ListValue(){
-        return Character.toString(valueInScreen.charAt(valueInScreen.length()-1));
+    private String retornLastCaracter_ListValue() {
+        return Character.toString(valueInScreen.charAt(valueInScreen.length() - 1));
     }
+
     private void setValueInScreen(String value) {
+        String[] listValues = splitValueInScreen();
         if (listOperations.contains(Pattern.quote(value)) && !(valueInScreen.equals(""))) {
             if (isLastElementAOperator()) {
                 replaceLastValueInScreenIfIsAOperator(value);
@@ -287,17 +304,15 @@ public class MainActivity extends AppCompatActivity {
             }
             printInScreenOfOperations(returnExpression());
         } else {
-            if (!(listOperations.contains(Pattern.quote(value)))) {
+            if (listValues[listValues.length - 1].length() - 1 == 18) {
+                Clear();
+            } else if (!(listOperations.contains(Pattern.quote(value)))) {
                 valueInScreen += value;
-                String[] listValues = splitValueInScreen();
-                printInScreenOfOperations(formatValue(listValues[listValues.length-1]));
+                listValues = splitValueInScreen();
+                printInScreenOfOperations(returnExpression());
+                printInScreenOfResults(formatValue(listValues[listValues.length - 1]));
             }
         }
-
- /*       if (listValues.length - 1 > 18) {
-            Clear();
-        }*/
-
     }
 
     public void replaceLastValueInScreenIfIsAOperator(String value) {

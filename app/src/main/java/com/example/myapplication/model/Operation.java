@@ -57,11 +57,11 @@ public class Operation implements Serializable {
     public void setValue(String number) {
         this.value.add(number);
     }
-    public boolean verifyIfValueListIsEmpty(){
-        if (this.value.size() < 1){
+
+    public boolean verifyIfValueListIsEmpty() {
+        if (this.value.size() < 1) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -70,17 +70,15 @@ public class Operation implements Serializable {
         if (this.value.size() == 0) {
             setValue(value);
         } else {
-            this.value.remove(returnSizeOfValue()-1);
+            this.value.remove(returnSizeOfValue() - 1);
             this.value.add(value);
         }
     }
+
     public void updateOperation(String value) {
-        if (this.operation.size() == 0) {
-            setOperation(value);
-        } else {
-            this.operation.remove(returnSizeOfOperations()-1);
-            this.operation.add(value);
-        }
+        this.operation.remove(returnSizeOfOperations() - 1);
+        this.operation.add(value);
+
     }
 
 
