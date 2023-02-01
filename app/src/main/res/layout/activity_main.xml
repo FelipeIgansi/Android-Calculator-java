@@ -414,7 +414,7 @@
         android:layout_marginTop="1dp"
         android:layout_marginEnd="1dp"
         android:layout_marginBottom="1dp"
-        android:background="@drawable/style_button_result"
+        android:background="@drawable/style_button_result_clicked"
         android:backgroundTint="@null"
         android:text="@string/btn_Result"
         android:textColor="@color/black"
