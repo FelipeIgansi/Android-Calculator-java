@@ -59,20 +59,12 @@ public class Operation implements Serializable {
     }
 
     public boolean verifyIfValueListIsEmpty() {
-        if (this.value.size() < 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.value.size() < 1;
     }
 
     public void updateValue(String value) {
-        if (this.value.size() == 0) {
-            setValue(value);
-        } else {
-            this.value.remove(returnSizeOfValue() - 1);
-            this.value.add(value);
-        }
+        this.value.remove(returnSizeOfValue() - 1);
+        this.value.add(value);
     }
 
     public void updateOperation(String value) {

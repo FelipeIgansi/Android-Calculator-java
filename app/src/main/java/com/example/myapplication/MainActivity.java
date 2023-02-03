@@ -11,9 +11,6 @@ import com.example.myapplication.model.Operation;
 import com.example.myapplication.util.Convert;
 
 import java.text.NumberFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -23,13 +20,13 @@ public class MainActivity extends AppCompatActivity {
     private static final Set<String> listOperations;
 
     static {
-        listOperations = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+        listOperations = Set.of(
                 Pattern.quote("+"),
                 Pattern.quote("-"),
                 Pattern.quote("/"),
                 Pattern.quote("x"),
                 Pattern.quote("%"),
-                Pattern.quote("="))));
+                Pattern.quote("="));
     }
 
     private final Operation operations = new Operation();
@@ -37,9 +34,9 @@ public class MainActivity extends AppCompatActivity {
     public String valueInScreen = "";
     private Button button;
     private boolean btnResultClicked = false;
-    private Locale localeBR = new Locale("pt", "br");
+    private final Locale localeBR = new Locale("pt", "br");
 
-    private NumberFormat numberFormat = NumberFormat.getNumberInstance(localeBR);
+    private final NumberFormat numberFormat = NumberFormat.getNumberInstance(localeBR);
 
 
     @Override
@@ -65,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         setOperation(R.id.btn_Subtraction, "-");
         setOperation(R.id.btn_Multiplication, "x");
         setOperation(R.id.btn_Division, "/");
+        setFunction(R.id.btn_Comma, ",");
         setFunction(R.id.btn_Percent, "%");
         setFunction(R.id.btn_InvertSignal, "+/-");
         setFunction(R.id.btn_Result, "=");
@@ -117,7 +115,19 @@ public class MainActivity extends AppCompatActivity {
                             printInScreenOfOperations(returnExpression());
                             printInScreenOfResults("");
                             break;
+                        case ",":
+                            String[] values = splitValueInScreen();
 
+                            if (!(haveComma(values[values.length-1]))) {
+                                if (valueInScreen.equals("")) {
+                                    valueInScreen = "0.";
+                                } else {
+                                    valueInScreen += ".";
+                                }
+                                printInScreenOfOperations(valueInScreen.replace(".", ","));
+                                printInScreenOfResults(valueInScreen.replace(".", ","));
+                            }
+                            break;
                         case "%":
                             if (!(valueInScreen.equals(""))) {
                                 setInListValue();
@@ -144,18 +154,16 @@ public class MainActivity extends AppCompatActivity {
 
                         case "+/-":
                             if (!(valueInScreen.equals(""))) {
-                                setInListValue();
-                                int value = convert.StrToInt(getValue_ListValue(getSize_ListValue()));
-                                value = InvertSignal(value);
-                                if (operations.verifyIfValueListIsEmpty()) {
-                                    operations.setValue(convert.IntToStr(value));
-                                    updateValueInScreen(convert.IntToStr(value));
-                                } else {
-                                    operations.updateValue(convert.IntToStr(value));
-                                    updateValueInScreen(convert.IntToStr(value));
+                                if (operations.returnSizeOfValue() == 0) {
+                                    setInListValue();
                                 }
+                                int value = convert.StrToInt(getValue_ListValue(getSize_ListValue() - 1));
+                                value = InvertSignal(value);
+                                operations.updateValue(convert.IntToStr(value));
+                                updateValueInScreen(convert.IntToStr(value));
 
                                 printInScreenOfOperations(convert.IntToStr(value));
+                                printInScreenOfResults("");
                                 break;
                             }
 
@@ -164,10 +172,11 @@ public class MainActivity extends AppCompatActivity {
                                 setInListValue();
                                 Double total = convert.StrToDouble(getValue_ListValue(0));
                                 total = getTotal(total);
-                                if (!(total < 0)) {
-                                    printInScreenOfResults(formatValue(convert.IntToStr(total.intValue())));
-                                } else {
+                                if (haveComma(convert.DoubleToStr(total))) {
                                     printInScreenOfResults(convert.DoubleToStr(total));
+                                } else {
+                                    printInScreenOfResults(formatValue(convert.IntToStr(total.intValue())));
+
                                 }
                                 btnResultWasClicked(true);
                                 valueInScreen = formatValue(convert.IntToStr(total.intValue()));
@@ -177,6 +186,23 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    @NonNull
+    private Boolean haveComma(String value) {
+        String[] valueInScreenDivided = value.split("");
+        for (String caracter : valueInScreenDivided) {
+            if (caracter.equals(".")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @NonNull
+    private String[] splitValueInScreen(String value) {
+        return valueInScreen.split(value);
+    }
+
 
     private Double getTotal(Double total) {
         int j = 1;
@@ -234,11 +260,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateValueInScreen(String value) {
-        String[] Value = splitValueInScreen();
+/*        String[] Value = splitValueInScreen();
         if (Value.length != 0) {
             Clear();
-        }
-        valueInScreen += value;
+        }*/
+        valueInScreen = value;
     }
 
     private void CancelEntry() {
@@ -296,21 +322,27 @@ public class MainActivity extends AppCompatActivity {
 
     private void setValueInScreen(String value) {
         String[] listValues = splitValueInScreen();
-        if (listOperations.contains(Pattern.quote(value)) && !(valueInScreen.equals(""))) {
-            if (isLastElementAOperator()) {
-                replaceLastValueInScreenIfIsAOperator(value);
-            } else {
-                valueInScreen += value;
-            }
-            printInScreenOfOperations(returnExpression());
+        if (haveComma(listValues[listValues.length-1])) {
+            valueInScreen += value;
+            printInScreenOfOperations(valueInScreen.replace(".", ","));
+            printInScreenOfResults(valueInScreen.replace(".", ","));
         } else {
-            if (listValues[listValues.length - 1].length() - 1 == 18) {
-                Clear();
-            } else if (!(listOperations.contains(Pattern.quote(value)))) {
-                valueInScreen += value;
-                listValues = splitValueInScreen();
+            if (listOperations.contains(Pattern.quote(value)) && !(valueInScreen.equals(""))) {
+                if (isLastElementAOperator()) {
+                    replaceLastValueInScreenIfIsAOperator(value);
+                } else {
+                    valueInScreen += value;
+                }
                 printInScreenOfOperations(returnExpression());
-                printInScreenOfResults(formatValue(listValues[listValues.length - 1]));
+            } else {
+                if (listValues[listValues.length - 1].length() - 1 == 18) {
+                    Clear();
+                } else if (!(listOperations.contains(Pattern.quote(value)))) {
+                    valueInScreen += value;
+                    listValues = splitValueInScreen();
+                    printInScreenOfOperations(returnExpression());
+                    printInScreenOfResults(formatValue(listValues[listValues.length - 1]));
+                }
             }
         }
     }
