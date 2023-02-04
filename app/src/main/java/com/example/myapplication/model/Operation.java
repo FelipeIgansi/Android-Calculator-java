@@ -58,10 +58,6 @@ public class Operation implements Serializable {
         this.value.add(number);
     }
 
-    public boolean verifyIfValueListIsEmpty() {
-        return this.value.size() < 1;
-    }
-
     public void updateValue(String value) {
         this.value.remove(returnSizeOfValue() - 1);
         this.value.add(value);

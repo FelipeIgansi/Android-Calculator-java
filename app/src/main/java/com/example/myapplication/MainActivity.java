@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         StartButtons();
     }
 
@@ -117,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case ",":
                             String[] values = splitValueInScreen();
-
                             if (!(haveComma(values[values.length-1]))) {
                                 if (valueInScreen.equals("")) {
                                     valueInScreen = "0.";
@@ -198,11 +196,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    @NonNull
-    private String[] splitValueInScreen(String value) {
-        return valueInScreen.split(value);
-    }
-
 
     private Double getTotal(Double total) {
         int j = 1;
@@ -260,10 +253,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateValueInScreen(String value) {
-/*        String[] Value = splitValueInScreen();
-        if (Value.length != 0) {
-            Clear();
-        }*/
         valueInScreen = value;
     }
 
