@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -29,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
                 Pattern.quote("="));
     }
 
+    private MediaPlayer media;
+
     private final Operation operations = new Operation();
     private final Convert convert = new Convert();
     public String valueInScreen = "";
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        media = MediaPlayer.create(this, R.raw.feedback_sound_click);
         StartButtons();
     }
 
@@ -111,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
                         case "CE":
                             CancelEntry();
-                            printInScreenOfOperations(returnExpression());
+                            printInScreenOfOperations(valueInScreen.replace(".", ","));
                             printInScreenOfResults("");
                             break;
                         case ",":
@@ -129,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
                         case "%":
                             if (!(valueInScreen.equals(""))) {
                                 setInListValue();
+                                String[] Values = splitValueInScreen();
                                 double totalPercent = 0;
                                 if (getSize_ListOperations() >= 2) {
                                     switch (getValue_ListOperations(0)) {
@@ -147,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
                                     valueInScreen = "0";
                                 }
                                 printInScreenOfOperations(returnExpression());
+                                printInScreenOfResults(Values[Values.length-1]+"%");
                                 break;
                             }
 
@@ -174,11 +180,11 @@ public class MainActivity extends AppCompatActivity {
                                     printInScreenOfResults(convert.DoubleToStr(total));
                                 } else {
                                     printInScreenOfResults(formatValue(convert.IntToStr(total.intValue())));
-
                                 }
                                 btnResultWasClicked(true);
-                                valueInScreen = formatValue(convert.IntToStr(total.intValue()));
+                                valueInScreen = "";
                                 operations.clearOperations();
+                                operations.clearListOfValues();
                                 break;
                             }
                     }
@@ -334,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+        media.start();
     }
 
     public void replaceLastValueInScreenIfIsAOperator(String value) {

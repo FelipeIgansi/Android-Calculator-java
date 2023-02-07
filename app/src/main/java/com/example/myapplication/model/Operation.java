@@ -73,4 +73,8 @@ public class Operation implements Serializable {
     public void setOperation(String operation) {
         this.operation.add(operation);
     }
+
+    public boolean isListValueEmpty() {
+        return this.value.isEmpty();
+    }
 }
