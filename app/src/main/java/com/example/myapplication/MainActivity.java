@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final Operation operations = new Operation();
     private final Convert convert = new Convert();
-    public String valueInScreen = "";
+    public String valuesInScreen = "";
     private Button button;
     private boolean btnResultClicked = false;
     private final Locale localeBR = new Locale("pt", "br");
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setValue(int idButton, int value) {
         button = findViewById(idButton);
-        button.setOnClickListener(view -> setValueInScreen(convert.IntToStr(value)));
+        button.setOnClickListener(view -> setValuesInScreen(convert.IntToStr(value)));
     }
 
     private void setOperation(int idButton, String inputOperation) {
@@ -86,14 +86,14 @@ public class MainActivity extends AppCompatActivity {
                 case "-":
                 case "x":
                 case "/":
-                    if (!(valueInScreen.equals(""))) {
+                    if (!(valuesInScreen.equals(""))) {
                         VerifyIfBtnResultWasClicked();
                         if (listOperations.contains(Pattern.quote(retornLastCaracter_ListValue()))) {
                             operations.updateOperation(inputOperation);
                         } else {
                             operations.setOperation(inputOperation);
                         }
-                        setValueInScreen(inputOperation);
+                        setValuesInScreen(inputOperation);
                         printInScreenOfOperations(returnExpression());
                         break;
                     }
@@ -115,25 +115,25 @@ public class MainActivity extends AppCompatActivity {
 
                         case "CE":
                             CancelEntry();
-                            printInScreenOfOperations(valueInScreen.replace(".", ","));
+                            printInScreenOfOperations(valuesInScreen.replace(".", ","));
                             printInScreenOfResults("");
                             break;
                         case ",":
-                            String[] values = splitValueInScreen();
-                            if (!(haveComma(values[values.length-1]))) {
-                                if (valueInScreen.equals("")) {
-                                    valueInScreen = "0.";
+                            String[] values = splitValues();
+                            if (!(haveComma(values[values.length - 1]))) {
+                                if (valuesInScreen.equals("")) {
+                                    valuesInScreen = "0.";
                                 } else {
-                                    valueInScreen += ".";
+                                    valuesInScreen += ".";
                                 }
-                                printInScreenOfOperations(valueInScreen.replace(".", ","));
-                                printInScreenOfResults(valueInScreen.replace(".", ","));
+                                printInScreenOfOperations(valuesInScreen.replace(".", ","));
+                                printInScreenOfResults(valuesInScreen.replace(".", ","));
                             }
                             break;
                         case "%":
-                            if (!(valueInScreen.equals(""))) {
+                            if (!(valuesInScreen.equals(""))) {
                                 setInListValue();
-                                String[] Values = splitValueInScreen();
+                                String[] Values = splitValues();
                                 double totalPercent = 0;
                                 if (getSize_ListOperations() >= 2) {
                                     switch (getValue_ListOperations(0)) {
@@ -147,32 +147,45 @@ public class MainActivity extends AppCompatActivity {
                                             break;
                                     }
                                     CancelEntry();
-                                    valueInScreen += totalPercent;
+                                    valuesInScreen += totalPercent;
                                 } else {
-                                    valueInScreen = "0";
+                                    valuesInScreen = "0";
                                 }
                                 printInScreenOfOperations(returnExpression());
-                                printInScreenOfResults(Values[Values.length-1]+"%");
+                                printInScreenOfResults(Values[Values.length - 1] + "%");
                                 break;
                             }
 
                         case "+/-":
-                            if (!(valueInScreen.equals(""))) {
-                                if (operations.returnSizeOfValue() == 0) {
+                            if (!(valuesInScreen.equals(""))) {
+                                if (operations.verifyIfListValuesIsEmpty()) {
                                     setInListValue();
                                 }
-                                int value = convert.StrToInt(getValue_ListValue(getSize_ListValue() - 1));
-                                value = InvertSignal(value);
-                                operations.updateValue(convert.IntToStr(value));
-                                updateValueInScreen(convert.IntToStr(value));
-
-                                printInScreenOfOperations(convert.IntToStr(value));
-                                printInScreenOfResults("");
-                                break;
+                                int lastValue = convert.StrToInt(operations.getValue(operations.returnSizeOfValue() - 1));
+                                String valueInput;
+                                int valueInverted = 0;
+                                if (!(operations.verifyIfOperationIsEmpty())) {
+                                    switch (witchIsTheLastOperator()) {
+                                        case "-": case "+": case "x": case "/":
+                                                valueInverted = InvertSignal(lastValue);
+                                                valueInput = valuesInScreen.substring(0, idLastOperator() + 1);
+                                                operations.updateValue(convert.IntToStr(valueInverted));
+                                                printInScreenOfOperations(valueInput);
+                                                break;
+                                    }
+                                } else {
+                                    valueInverted = InvertSignal(lastValue);
+                                    operations.updateValue(convert.IntToStr(valueInverted));
+                                    updateValueInScreen(convert.IntToStr(valueInverted));
+                                    printInScreenOfOperations(convert.IntToStr(valueInverted));
+                                }
+                                printInScreenOfResults(convert.IntToStr(valueInverted));
                             }
+                            break;
+
 
                         case "=":
-                            if (!(valueInScreen.equals(""))) {
+                            if (!(valuesInScreen.equals(""))) {
                                 setInListValue();
                                 Double total = convert.StrToDouble(getValue_ListValue(0));
                                 total = getTotal(total);
@@ -182,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                                     printInScreenOfResults(formatValue(convert.IntToStr(total.intValue())));
                                 }
                                 btnResultWasClicked(true);
-                                valueInScreen = "";
+                                valuesInScreen = "";
                                 operations.clearOperations();
                                 operations.clearListOfValues();
                                 break;
@@ -191,8 +204,29 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    private String witchIsTheLastOperator() {
+        String[] valuesInScreenDivided = splitValues("");
+        for (int i = (valuesInScreenDivided.length - 1); i >= 0; i--) {
+            if (listOperations.contains(Pattern.quote(valuesInScreenDivided[i]))) {
+                return valuesInScreenDivided[i];
+            }
+        }
+        return "";
+    }
+
+
+    private int idLastOperator() {
+        String[] valuesInScreenDivided = splitValues("");
+        for (int i = 0; i < valuesInScreenDivided.length; i++) {
+            if (listOperations.contains(Pattern.quote(valuesInScreenDivided[i]))) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
     @NonNull
-    private Boolean haveComma(String value) {
+    private Boolean haveComma(@NonNull String value) {
         String[] valueInScreenDivided = value.split("");
         for (String caracter : valueInScreenDivided) {
             if (caracter.equals(".")) {
@@ -204,29 +238,27 @@ public class MainActivity extends AppCompatActivity {
 
 
     private Double getTotal(Double total) {
-        int j = 1;
-        for (int i = 0; i < operations.returnSizeOfOperations(); i++) {
+        String[] valuesDivided = splitValues();
+        for (int i = 0; i < getSize_ListOperations(); i++) {
             label:
-            for (int r = j; r < getSize_ListOperations(); r++) {
+            for (String value:
+                    valuesDivided) {
                 switch (getValue_ListOperations(i)) {
                     case "+":
-                        total = operations.sum(total, convert.StrToDouble(getValue_ListValue(r)));
-                        j = r + 1;
+                        total = operations.sum(total, convert.StrToInt(value));
                         break label;
                     case "-":
-                        total = operations.subtraction(total, convert.StrToDouble(getValue_ListValue(r)));
-                        j = r + 1;
+                        total = operations.subtraction(total, convert.StrToInt(value));
                         break label;
                     case "x":
-                        total = operations.multiplication(total, convert.StrToDouble(getValue_ListValue(r)));
-                        j = r + 1;
+                        total = operations.multiplication(total, convert.StrToDouble(value));
                         break label;
                     case "/":
-                        total = operations.division(total, convert.StrToDouble(getValue_ListValue(r)));
-                        j = r + 1;
+                        total = operations.division(total, convert.StrToDouble(value));
                         break label;
                 }
             }
+
         }
         return total;
     }
@@ -240,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int getSize_ListOperations() {
-        return operations.returnSizeOfValue();
+        return this.operations.returnSizeOfOperations();
     }
 
     private String getValue_ListValue(int id) {
@@ -259,16 +291,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateValueInScreen(String value) {
-        valueInScreen = value;
+        valuesInScreen = value;
     }
 
     private void CancelEntry() {
-        if (!valueInScreen.isEmpty()) {
-            for (int i = valueInScreen.length() - 1; i > 0; i--) {
-                char a = valueInScreen.charAt(i);
+        if (!valuesInScreen.isEmpty()) {
+            for (int i = valuesInScreen.length() - 1; i > 0; i--) {
+                char a = valuesInScreen.charAt(i);
                 System.out.println(a);
-                if ((listOperations.contains(Pattern.quote(Character.toString(valueInScreen.charAt(i)))))) {
-                    valueInScreen = (valueInScreen.substring(0, i + 1));
+                if ((listOperations.contains(Pattern.quote(Character.toString(valuesInScreen.charAt(i)))))) {
+                    valuesInScreen = (valuesInScreen.substring(0, i + 1));
                     break;
                 }
             }
@@ -276,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void Clear() {
-        valueInScreen = "";
+        valuesInScreen = "";
         operations.clearListOfValues();
         operations.clearOperations();
         printInScreenOfOperations("");
@@ -288,18 +320,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setInListValue() {
-        String[] values = splitValueInScreen();
+        String[] values = splitValues();
         operations.clearListOfValues();
         for (String value : values) {
-            operations.setValue(value);
+            if (!(value.equals("")))
+                operations.setValue(value);
         }
 
     }
 
     @NonNull
-    private String[] splitValueInScreen() {
+    private String[] splitValues() {
         String[] values;
-        values = valueInScreen.split(String.valueOf(listOperations));
+        values = valuesInScreen.split(String.valueOf(listOperations));
+        return values;
+    }
+
+    @NonNull
+    private String[] splitValues(String whereToCut) {
+        String[] values;
+        values = valuesInScreen.split(whereToCut);
         return values;
     }
 
@@ -308,47 +348,52 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public String returnExpression() {
-        return valueInScreen;
+        return valuesInScreen;
     }
 
+    @NonNull
     private String retornLastCaracter_ListValue() {
-        return Character.toString(valueInScreen.charAt(valueInScreen.length() - 1));
+        return Character.toString(valuesInScreen.charAt(valuesInScreen.length() - 1));
     }
 
-    private void setValueInScreen(String value) {
-        String[] listValues = splitValueInScreen();
-        if (haveComma(listValues[listValues.length-1])) {
-            valueInScreen += value;
-            printInScreenOfOperations(valueInScreen.replace(".", ","));
-            printInScreenOfResults(valueInScreen.replace(".", ","));
+    private void setValuesInScreen(String value) {
+        String[] listValues = splitValues();
+        playFeedbackSound();
+        if (haveComma(listValues[listValues.length - 1])) {
+            valuesInScreen += value;
+            printInScreenOfOperations(valuesInScreen.replace(".", ","));
+            printInScreenOfResults(valuesInScreen.replace(".", ","));
         } else {
-            if (listOperations.contains(Pattern.quote(value)) && !(valueInScreen.equals(""))) {
+            if (listOperations.contains(Pattern.quote(value)) && !(valuesInScreen.equals(""))) {
                 if (isLastElementAOperator()) {
                     replaceLastValueInScreenIfIsAOperator(value);
                 } else {
-                    valueInScreen += value;
+                    valuesInScreen += value;
                 }
                 printInScreenOfOperations(returnExpression());
             } else {
                 if (listValues[listValues.length - 1].length() - 1 == 18) {
                     Clear();
                 } else if (!(listOperations.contains(Pattern.quote(value)))) {
-                    valueInScreen += value;
-                    listValues = splitValueInScreen();
+                    valuesInScreen += value;
+                    listValues = splitValues();
                     printInScreenOfOperations(returnExpression());
                     printInScreenOfResults(formatValue(listValues[listValues.length - 1]));
                 }
             }
         }
+    }
+
+    private void playFeedbackSound() {
         media.start();
     }
 
     public void replaceLastValueInScreenIfIsAOperator(String value) {
-        valueInScreen = valueInScreen.substring(0, valueInScreen.length() - 1) + value;
+        valuesInScreen = valuesInScreen.substring(0, valuesInScreen.length() - 1) + value;
     }
 
     private boolean isLastElementAOperator() {
-        return listOperations.contains(Pattern.quote(Character.toString(valueInScreen.charAt(valueInScreen.length() - 1))));
+        return listOperations.contains(Pattern.quote(Character.toString(valuesInScreen.charAt(valuesInScreen.length() - 1))));
     }
 
     public String formatValue(String value) {

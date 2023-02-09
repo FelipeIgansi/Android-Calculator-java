@@ -38,6 +38,7 @@ public class Operation implements Serializable {
         this.operation.clear();
     }
 
+
     public String getValue(int id) {
         return this.value.get(id);
     }
@@ -75,6 +76,13 @@ public class Operation implements Serializable {
     }
 
     public boolean isListValueEmpty() {
+        return this.value.isEmpty();
+    }
+
+    public boolean verifyIfOperationIsEmpty() {
+        return this.operation.isEmpty();
+    }
+    public boolean verifyIfListValuesIsEmpty() {
         return this.value.isEmpty();
     }
 }
