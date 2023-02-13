@@ -135,11 +135,11 @@ public class MainActivity extends AppCompatActivity {
                                 setInListValue();
                                 String[] Values = splitValues();
                                 double totalPercent = 0;
-                                if (getSize_ListOperations() >= 2) {
-                                    switch (getValue_ListOperations(0)) {
+                                if (getSize_ListOperations() >= 1) {
+                                    switch (getValue_ListOperations(0)) {// TODO Change this part Gambiarra detected
                                         case "+":
                                         case "-":
-                                            totalPercent = convert.StrToInt(getValue_ListValue(getSize_ListValue() - 2)) * getPercent();
+                                            totalPercent = convert.StrToInt(getValue_ListValue(getSize_ListValue()-1)) * getPercent();
                                             break;
                                         case "x":
                                         case "/":
@@ -166,12 +166,15 @@ public class MainActivity extends AppCompatActivity {
                                 int valueInverted = 0;
                                 if (!(operations.verifyIfOperationIsEmpty())) {
                                     switch (witchIsTheLastOperator()) {
-                                        case "-": case "+": case "x": case "/":
-                                                valueInverted = InvertSignal(lastValue);
-                                                valueInput = valuesInScreen.substring(0, idLastOperator() + 1);
-                                                operations.updateValue(convert.IntToStr(valueInverted));
-                                                printInScreenOfOperations(valueInput);
-                                                break;
+                                        case "-":
+                                        case "+":
+                                        case "x":
+                                        case "/":
+                                            valueInverted = InvertSignal(lastValue);
+                                            valueInput = valuesInScreen.substring(0, idLastOperator() + 1);
+                                            operations.updateValue(convert.IntToStr(valueInverted));
+                                            printInScreenOfOperations(valueInput);
+                                            break;
                                     }
                                 } else {
                                     valueInverted = InvertSignal(lastValue);
@@ -189,11 +192,7 @@ public class MainActivity extends AppCompatActivity {
                                 setInListValue();
                                 Double total = convert.StrToDouble(getValue_ListValue(0));
                                 total = getTotal(total);
-                                if (haveComma(convert.DoubleToStr(total))) {
-                                    printInScreenOfResults(convert.DoubleToStr(total));
-                                } else {
-                                    printInScreenOfResults(formatValue(convert.IntToStr(total.intValue())));
-                                }
+                                printInScreenOfResults(convert.DoubleToStr(total));
                                 btnResultWasClicked(true);
                                 valuesInScreen = "";
                                 operations.clearOperations();
@@ -238,33 +237,35 @@ public class MainActivity extends AppCompatActivity {
 
 
     private Double getTotal(Double total) {
-        String[] valuesDivided = splitValues();
-        for (int i = 0; i < getSize_ListOperations(); i++) {
+        int j = 1;
+        for (int i = 0; i < operations.returnSizeOfOperations(); i++) {
             label:
-            for (String value:
-                    valuesDivided) {
+            for (int r = j; r <= getSize_ListValue(); r++) {
                 switch (getValue_ListOperations(i)) {
                     case "+":
-                        total = operations.sum(total, convert.StrToInt(value));
+                        total = operations.sum(total, convert.StrToDouble(getValue_ListValue(r)));
+                        j = r + 1;
                         break label;
                     case "-":
-                        total = operations.subtraction(total, convert.StrToInt(value));
+                        total = operations.subtraction(total, convert.StrToDouble(getValue_ListValue(r)));
+                        j = r + 1;
                         break label;
                     case "x":
-                        total = operations.multiplication(total, convert.StrToDouble(value));
+                        total = operations.multiplication(total, convert.StrToDouble(getValue_ListValue(r)));
+                        j = r + 1;
                         break label;
                     case "/":
-                        total = operations.division(total, convert.StrToDouble(value));
+                        total = operations.division(total, convert.StrToDouble(getValue_ListValue(r)));
+                        j = r + 1;
                         break label;
                 }
             }
-
         }
         return total;
     }
 
     private double getPercent() {
-        return convert.StrToDouble(getValue_ListValue(getSize_ListValue() - 1)) / 100;
+        return convert.StrToDouble(getValue_ListValue(getSize_ListValue())) / 100;
     }
 
     private String getValue_ListOperations(int id) {
