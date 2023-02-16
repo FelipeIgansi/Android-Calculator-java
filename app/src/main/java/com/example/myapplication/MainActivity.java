@@ -92,11 +92,17 @@ public class MainActivity extends AppCompatActivity {
                 case "/":
                     // Insert the operations
                     if (!(valuesInScreen.equals(""))) {
-                        setInListValue();
+                        if (!btnInvertSignalClicked){
+                            setInListValue();
+                        }else if (inputOperation.equals(Pattern.quote("-"))){
+                            operations.updateOperation("+");
+                        }
                         if (!(inputOperation.equals(Pattern.quote("%")))) {
                             if (getSize_ListValue() >= 2) {
                                 double total = returnTotalCalcule();
+                                Clear();
                                 valuesInScreen = convert.IntToStr((int) (total));
+                                operations.setValue(convert.DoubleToStr(total));
                             }
                         }
                         if (listOperations.contains(Pattern.quote(retornLastCaracter_ListValue()))) {
@@ -165,17 +171,21 @@ public class MainActivity extends AppCompatActivity {
                                 // TODO Gambiarra
                                 operations.removeLastValue();
                                 btnPercentClicked();
-                                printInScreenOfOperations(returnExpression());
+                                printInScreenOfOperations(replaceDotToComma(returnExpression()));
                                 printInScreenOfResults(Values[Values.length - 1] + "%");
                                 break;
                             }
 
                         case "+/-":// Invert the signal do make a validation for if the value in screen have operation
                             if (!(valuesInScreen.equals(""))) {
-                                if (operations.verifyIfListValuesIsEmpty()) {
-                                    setInListValue();
+                                if (!btnInvertSignalClicked){
+                                    if (operations.verifyIfListValuesIsEmpty()) {
+                                        setInListValue();
+                                    } else {
+                                        setInListLastValue();
+                                    }
                                 }
-                                int lastValue = convert.StrToInt(operations.getValue(operations.returnSizeOfValue() - 1));
+                                int lastValue = convert.StrToInt(operations.getValue(operations.returnSizeOfValue()-1));
                                 String valueInput;
                                 int valueInverted = 0;
                                 if (!(operations.verifyIfOperationIsEmpty())) {
@@ -185,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                                         case "x":
                                         case "/":
                                             valueInverted = InvertSignal(lastValue);
-                                            valueInput = valuesInScreen.substring(0, idLastOperator() + 1);
+                                            valueInput = valuesInScreen.substring(0, idLastOperator() + 2);
                                             operations.updateValue(convert.IntToStr(valueInverted));
                                             printInScreenOfOperations(valueInput);
                                             break;
@@ -193,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
                                     valueInverted = InvertSignal(lastValue);
                                     operations.updateValue(convert.IntToStr(valueInverted));
-//                                    updateValueInScreen(convert.IntToStr(valueInverted));
+                                    updateValueInScreen(convert.IntToStr(valueInverted));
                                     printInScreenOfOperations(convert.IntToStr(valueInverted));
                                 }
                                 btnInvertSignalWasClicked();
@@ -206,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
                             if (!(valuesInScreen.equals(""))) {
                                 setInListLastValue();
                                 Double total = returnTotalCalcule();
-                                printInScreenOfResults(convert.DoubleToStr(total));
+                                printInScreenOfResults(replaceDotToComma(convert.DoubleToStr(total)));
                                 valuesInScreen = "";
                                 operations.clearOperations();
                                 operations.clearListOfValues();
@@ -214,6 +224,9 @@ public class MainActivity extends AppCompatActivity {
                             }
                     }
                 });
+    }
+    private String replaceDotToComma(String value){
+        return value.replace(".",",");
     }
 
     private Double returnTotalCalcule() {

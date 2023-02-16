@@ -76,6 +76,12 @@ public class Operation implements Serializable {
     public void removeLastOperation() {
         this.operation.remove(returnSizeOfOperations() - 1);
     }
+    public void removeOperation(int id) {
+        this.operation.remove(id);
+    }
+    public void removeValue(int id) {
+        this.operation.remove(id);
+    }
 
 
     public void setOperation(String operation) {
@@ -91,5 +97,9 @@ public class Operation implements Serializable {
     }
     public boolean verifyIfListValuesIsEmpty() {
         return this.value.isEmpty();
+    }
+
+    public void updateValueForId(int id, String value) {
+
     }
 }
