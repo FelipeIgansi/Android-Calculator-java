@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private static final Set<String> listOperations;
 
     static {
+        // Pattern.quote do the escape because the characters "+" e o "-" can be generate problems for being used for the system
         listOperations = Set.of(
                 Pattern.quote("+"),
                 Pattern.quote("-"),
@@ -36,21 +37,24 @@ public class MainActivity extends AppCompatActivity {
     private final Convert convert = new Convert();
     public String valuesInScreen = "";
     private Button button;
-    private boolean btnResultClicked = false;
     private final Locale localeBR = new Locale("pt", "br");
 
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance(localeBR);
+    private boolean btnPercentClicked = false;
+    private boolean btnInvertSignalClicked = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Start the player
         media = MediaPlayer.create(this, R.raw.feedback_sound_click);
         StartButtons();
     }
 
     private void StartButtons() {
+        // One method for insert values, one for insert the operations and one for make the functions
         setValue(R.id.btn_One, 1);
         setValue(R.id.btn_Two, 2);
         setValue(R.id.btn_Three, 3);
@@ -86,8 +90,15 @@ public class MainActivity extends AppCompatActivity {
                 case "-":
                 case "x":
                 case "/":
+                    // Insert the operations
                     if (!(valuesInScreen.equals(""))) {
-                        VerifyIfBtnResultWasClicked();
+                        setInListValue();
+                        if (!(inputOperation.equals(Pattern.quote("%")))) {
+                            if (getSize_ListValue() >= 2) {
+                                double total = returnTotalCalcule();
+                                valuesInScreen = convert.IntToStr((int) (total));
+                            }
+                        }
                         if (listOperations.contains(Pattern.quote(retornLastCaracter_ListValue()))) {
                             operations.updateOperation(inputOperation);
                         } else {
@@ -107,18 +118,18 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(
                 view -> {
                     switch (function) {
-                        case "C":
+                        case "C":// CLear all values in screen
                             Clear();
                             printInScreenOfOperations(returnExpression());
                             printInScreenOfResults(returnExpression());
                             break;
 
-                        case "CE":
+                        case "CE": // Cancel last entry data
                             CancelEntry();
                             printInScreenOfOperations(valuesInScreen.replace(".", ","));
                             printInScreenOfResults("");
                             break;
-                        case ",":
+                        case ",":// Insert dot(In Brazil is Comma)
                             String[] values = splitValues();
                             if (!(haveComma(values[values.length - 1]))) {
                                 if (valuesInScreen.equals("")) {
@@ -130,16 +141,16 @@ public class MainActivity extends AppCompatActivity {
                                 printInScreenOfResults(valuesInScreen.replace(".", ","));
                             }
                             break;
-                        case "%":
+                        case "%":// This function will go two things: if the operations is + or - will insert the value * percent and if the operations is x or / print just percent
                             if (!(valuesInScreen.equals(""))) {
                                 setInListValue();
                                 String[] Values = splitValues();
                                 double totalPercent = 0;
                                 if (getSize_ListOperations() >= 1) {
-                                    switch (getValue_ListOperations(0)) {// TODO Change this part Gambiarra detected
+                                    switch (getValue_ListOperations(getSize_ListOperations() - 1)) {
                                         case "+":
                                         case "-":
-                                            totalPercent = convert.StrToInt(getValue_ListValue(getSize_ListValue()-1)) * getPercent();
+                                            totalPercent = convert.StrToInt(getValue_ListValue(getSize_ListValue() - 2)) * getPercent();
                                             break;
                                         case "x":
                                         case "/":
@@ -151,12 +162,15 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
                                     valuesInScreen = "0";
                                 }
+                                // TODO Gambiarra
+                                operations.removeLastValue();
+                                btnPercentClicked();
                                 printInScreenOfOperations(returnExpression());
                                 printInScreenOfResults(Values[Values.length - 1] + "%");
                                 break;
                             }
 
-                        case "+/-":
+                        case "+/-":// Invert the signal do make a validation for if the value in screen have operation
                             if (!(valuesInScreen.equals(""))) {
                                 if (operations.verifyIfListValuesIsEmpty()) {
                                     setInListValue();
@@ -179,9 +193,10 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
                                     valueInverted = InvertSignal(lastValue);
                                     operations.updateValue(convert.IntToStr(valueInverted));
-                                    updateValueInScreen(convert.IntToStr(valueInverted));
+//                                    updateValueInScreen(convert.IntToStr(valueInverted));
                                     printInScreenOfOperations(convert.IntToStr(valueInverted));
                                 }
+                                btnInvertSignalWasClicked();
                                 printInScreenOfResults(convert.IntToStr(valueInverted));
                             }
                             break;
@@ -189,11 +204,9 @@ public class MainActivity extends AppCompatActivity {
 
                         case "=":
                             if (!(valuesInScreen.equals(""))) {
-                                setInListValue();
-                                Double total = convert.StrToDouble(getValue_ListValue(0));
-                                total = getTotal(total);
+                                setInListLastValue();
+                                Double total = returnTotalCalcule();
                                 printInScreenOfResults(convert.DoubleToStr(total));
-                                btnResultWasClicked(true);
                                 valuesInScreen = "";
                                 operations.clearOperations();
                                 operations.clearListOfValues();
@@ -201,6 +214,20 @@ public class MainActivity extends AppCompatActivity {
                             }
                     }
                 });
+    }
+
+    private Double returnTotalCalcule() {
+        Double total = convert.StrToDouble(getValue_ListValue(0));
+        total = getTotal(total);
+        return total;
+    }
+
+    private void btnInvertSignalWasClicked() {
+        btnInvertSignalClicked = true;
+    }
+
+    private void btnPercentClicked() {
+        btnPercentClicked = true;
     }
 
     private String witchIsTheLastOperator() {
@@ -215,11 +242,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private int idLastOperator() {
-        String[] valuesInScreenDivided = splitValues("");
-        for (int i = 0; i < valuesInScreenDivided.length; i++) {
-            if (listOperations.contains(Pattern.quote(valuesInScreenDivided[i]))) {
-                return i;
-            }
+        if (listOperations.contains(Pattern.quote(getValue_ListOperations(operations.returnSizeOfOperations()-1)))) {
+            return operations.returnSizeOfOperations()-1;
         }
         return 0;
     }
@@ -265,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private double getPercent() {
-        return convert.StrToDouble(getValue_ListValue(getSize_ListValue())) / 100;
+        return convert.StrToDouble(getValue_ListValue(getSize_ListValue()-1)) / 100;
     }
 
     private String getValue_ListOperations(int id) {
@@ -281,14 +305,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int getSize_ListValue() {
-        return getSize_ListOperations();
-    }
-
-    private void VerifyIfBtnResultWasClicked() {
-        if (btnResultClicked) {
-            printInScreenOfResults("");
-            btnResultWasClicked(false);
-        }
+        return this.operations.returnSizeOfValue();
     }
 
     private void updateValueInScreen(String value) {
@@ -327,7 +344,11 @@ public class MainActivity extends AppCompatActivity {
             if (!(value.equals("")))
                 operations.setValue(value);
         }
+    }
 
+    private void setInListLastValue() {
+        String[] values = splitValues(Pattern.quote(getValue_ListOperations( idLastOperator())));
+        operations.setValue(values[values.length - 1]);
     }
 
     @NonNull
@@ -344,10 +365,6 @@ public class MainActivity extends AppCompatActivity {
         return values;
     }
 
-    private void btnResultWasClicked(boolean value) {
-        btnResultClicked = value;
-    }
-
     public String returnExpression() {
         return valuesInScreen;
     }
@@ -359,7 +376,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setValuesInScreen(String value) {
         String[] listValues = splitValues();
-        playFeedbackSound();
+        playFeedbackSound();// Every moment that user press one button and insert then in screen play feedback sound
+        clearScreenIfBtnPercentWasClicked();// If percent was clicked AND user insert more values clear screen
         if (haveComma(listValues[listValues.length - 1])) {
             valuesInScreen += value;
             printInScreenOfOperations(valuesInScreen.replace(".", ","));
@@ -382,6 +400,13 @@ public class MainActivity extends AppCompatActivity {
                     printInScreenOfResults(formatValue(listValues[listValues.length - 1]));
                 }
             }
+        }
+    }
+
+    private void clearScreenIfBtnPercentWasClicked() {
+        if (btnPercentClicked) {
+            Clear();
+            btnPercentClicked = false;
         }
     }
 

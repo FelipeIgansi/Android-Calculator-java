@@ -38,7 +38,6 @@ public class Operation implements Serializable {
         this.operation.clear();
     }
 
-
     public String getValue(int id) {
         return this.value.get(id);
     }
@@ -60,14 +59,22 @@ public class Operation implements Serializable {
     }
 
     public void updateValue(String value) {
+        removeLastValue();
+        setValue(value);
+    }
+
+    public void removeLastValue() {
         this.value.remove(returnSizeOfValue() - 1);
-        this.value.add(value);
     }
 
     public void updateOperation(String value) {
-        this.operation.remove(returnSizeOfOperations() - 1);
-        this.operation.add(value);
+        removeLastOperation();
+        setOperation(value);
 
+    }
+
+    public void removeLastOperation() {
+        this.operation.remove(returnSizeOfOperations() - 1);
     }
 
 
