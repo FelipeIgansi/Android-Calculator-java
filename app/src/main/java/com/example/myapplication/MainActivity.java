@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private static final Set<String> listOperations;
 
     static {
-        // Pattern.quote do the escape because the characters.The "+" and "-" can be generate problems for being used for the system
+        // Pattern.quote do the escape because the characters "+" and "-" can generate problems for being used for the system
         listOperations = Set.of(
                 Pattern.quote("+"),
                 Pattern.quote("-"),
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                             operations.updateOperation("+");
                         }
                         if (btnInvertSignalClicked){
-                            btnInvertSignalClicked = false;
+                            setValueBtnInvertSignal(false);
                         }
                         calculateValue(inputOperation);
                         insertOperationIn_ListOperation(inputOperation);
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                             printInScreenOfOperations(valuesInScreen.replace(".", ","));
                             printInScreenOfResults("");
                             break;
-                        case ",":// Insert dot(In Brazil is Comma)
+                        case ",":// Insert dot(In Brazil is Comma) becouse this it is made the replace
                             String[] values = splitValues();
                             if (!(haveComma(values[values.length - 1]))) {
                                 insertDot();
@@ -137,7 +137,8 @@ public class MainActivity extends AppCompatActivity {
                                 printInScreenOfResults(valuesInScreen.replace(".", ","));
                             }
                             break;
-                        case "%":// This function will go two things: if the operations is + or - will insert the value * percent and if the operations is x or / print just percent
+                        case "%":// This function will do two things: if the operations is '+' or '-'
+                            // will insert the value * percent and if the operations is 'x' or '/' print just percent
                             if (!valueInScreen_IsEquals("")) {
                                 setInListValue();
                                 String[] Values = splitValues();
@@ -164,15 +165,15 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 operations.removeLastValue();
                                 btnPercentClicked();
-                                printInScreenOfOperations(replaceDotToComma(returnExpression()));
-                                printInScreenOfResults(Values[Values.length - 1] + "%");
+                                printInScreenOfOperations(replaceDotToComma(returnExpression()));// Print Expression with value of percent calculated
+                                printInScreenOfResults(Values[Values.length - 1] + "%");//When is press '%' insert this caracter in screen
                                 break;
                             }
 
                         case "+/-":// Invert the signal do make a validation for if the value in screen have operation
                             if (!valueInScreen_IsEquals("")) {
                                 insertValueIfBtnInvertSignalWasNotClicked();
-                                int lastValue = convert.StrToInt(operations.getValue(operations.returnSizeOfValue() - 1));
+                                int lastValue = convert.StrToInt(operations.getValue(getSize_ListValue() - 1));
                                 String valueInput;
                                 int valueInverted = 0;
                                 if (!(operations.verifyIfOperationIsEmpty())) {
@@ -227,10 +228,16 @@ public class MainActivity extends AppCompatActivity {
                                 updateValueInScreen("");
                                 operations.clearOperations();
                                 operations.clearListOfValues();
+                                btnPercentClicked = false;
+                                setValueBtnInvertSignal(false);
                                 break;
                             }
                     }
                 });
+    }
+
+    private void setValueBtnInvertSignal(boolean status) {
+        btnInvertSignalClicked = status;
     }
 
     private void insertValueIfBtnInvertSignalWasNotClicked() {
@@ -306,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void btnInvertSignalWasClicked() {
-        btnInvertSignalClicked = true;
+        setValueBtnInvertSignal(true);
     }
 
     private void btnPercentClicked() {
@@ -410,7 +417,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void clear() {
         updateValueInScreen("");
-        btnInvertSignalClicked = false;
+        setValueBtnInvertSignal(false);
         btnPercentClicked = false;
         operations.clearListOfValues();
         operations.clearOperations();
