@@ -58,7 +58,7 @@ public class Operation implements Serializable {
         this.value.add(number);
     }
 
-    public void updateValue(String value) {
+    public void updateLastValue(String value) {
         removeLastValue();
         setValue(value);
     }
@@ -97,9 +97,5 @@ public class Operation implements Serializable {
     }
     public boolean verifyIfListValuesIsEmpty() {
         return this.value.isEmpty();
-    }
-
-    public void updateValueForId(int id, String value) {
-
     }
 }

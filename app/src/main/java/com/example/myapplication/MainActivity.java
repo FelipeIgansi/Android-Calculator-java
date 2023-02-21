@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private static final Set<String> listOperations;
 
     static {
-        // Pattern.quote do the escape because the characters "+" e o "-" can be generate problems for being used for the system
+        // Pattern.quote do the escape because the characters.The "+" and "-" can be generate problems for being used for the system
         listOperations = Set.of(
                 Pattern.quote("+"),
                 Pattern.quote("-"),
@@ -91,11 +91,14 @@ public class MainActivity extends AppCompatActivity {
                 case "x":
                 case "/":
                     // Insert the operations and calculate if have more than 2 values
-                    if (!valueInScreen_IsEquals()) {
+                    if (!valueInScreen_IsEquals("")) {
                         if (!btnInvertSignalClicked) {
                             setInListValue();
                         } else if (inputOperation.equals(Pattern.quote("-"))) {
                             operations.updateOperation("+");
+                        }
+                        if (btnInvertSignalClicked){
+                            btnInvertSignalClicked = false;
                         }
                         calculateValue(inputOperation);
                         insertOperationIn_ListOperation(inputOperation);
@@ -115,12 +118,14 @@ public class MainActivity extends AppCompatActivity {
                     switch (function) {
                         case "C":// CLear all values in screen
                             clear();
-                            printInScreenOfOperations(returnExpression());
-                            printInScreenOfResults(returnExpression());
                             break;
 
                         case "CE": // Cancel last entry data
-                            cancelEntry();
+                            if (getSize_ListOperations() < 1) {
+                                clear();
+                            } else {
+                                cancelEntry();
+                            }
                             printInScreenOfOperations(valuesInScreen.replace(".", ","));
                             printInScreenOfResults("");
                             break;
@@ -133,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             break;
                         case "%":// This function will go two things: if the operations is + or - will insert the value * percent and if the operations is x or / print just percent
-                            if (!valueInScreen_IsEquals()) {
+                            if (!valueInScreen_IsEquals("")) {
                                 setInListValue();
                                 String[] Values = splitValues();
                                 double totalPercent = 0.0;
@@ -149,9 +154,9 @@ public class MainActivity extends AppCompatActivity {
                                             break;
                                     }
                                     cancelEntry();
-                                    if (haveValueAfterDot(convert.DoubleToStr(totalPercent))){
+                                    if (haveValueAfterDot(convert.DoubleToStr(totalPercent))) {
                                         incrementValueInScreen(convert.DoubleToStr(totalPercent));
-                                    }else {
+                                    } else {
                                         incrementValueInScreen(convert.IntToStr((int) totalPercent));
                                     }
                                 } else {
@@ -165,14 +170,8 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                         case "+/-":// Invert the signal do make a validation for if the value in screen have operation
-                            if (!valueInScreen_IsEquals()) {
-                                if (!btnInvertSignalClicked) {
-                                    if (operations.verifyIfListValuesIsEmpty()) {
-                                        setInListValue();
-                                    } else {
-                                        setInListLastValue();
-                                    }
-                                }
+                            if (!valueInScreen_IsEquals("")) {
+                                insertValueIfBtnInvertSignalWasNotClicked();
                                 int lastValue = convert.StrToInt(operations.getValue(operations.returnSizeOfValue() - 1));
                                 String valueInput;
                                 int valueInverted = 0;
@@ -183,14 +182,28 @@ public class MainActivity extends AppCompatActivity {
                                         case "x":
                                         case "/":
                                             valueInverted = invertSignal(lastValue);
-                                            valueInput = valuesInScreen.substring(0, idLastOperator() + 2);
-                                            operations.updateValue(convert.IntToStr(valueInverted));
-                                            printInScreenOfOperations(valueInput);
+                                            valueInput = valuesInScreen.substring(0, idFirstOperator()+1);
+                                            char lastCaracter = valueInput.charAt(valueInput.length() - 1);
+                                            if ((lastCaracter == '+' && valueInverted < 0) || (lastCaracter == '+' && valueInverted > 0)) {
+                                                setValueInScreenIfAreMoreThanTwoValuesWhenBtnInvertWasClicked(valueInverted);
+                                            }
+                                            else if ((lastCaracter == '-' && valueInverted < 0) || (lastCaracter == '-' && valueInverted > 0)) {
+                                                setValueInScreenIfAreMoreThanTwoValuesWhenBtnInvertWasClicked(valueInverted);
+                                            }
+                                            else {
+                                                if ((lastCaracter == 'x' && valueInverted < 0) || (lastCaracter == '/' && valueInverted < 0)) {
+                                                    updateValueInScreen(valueInput + "(" + valueInverted + ")");
+                                                } else {
+                                                    updateValueInScreen(valueInput + valueInverted);
+                                                }
+                                            }
+                                            operations.updateLastValue(convert.IntToStr(valueInverted));
+                                            printInScreenOfOperations(returnExpression());
                                             break;
                                     }
                                 } else {
                                     valueInverted = invertSignal(lastValue);
-                                    operations.updateValue(convert.IntToStr(valueInverted));
+                                    operations.updateLastValue(convert.IntToStr(valueInverted));
                                     updateValueInScreen(convert.IntToStr(valueInverted));
                                     printInScreenOfOperations(convert.IntToStr(valueInverted));
                                 }
@@ -201,8 +214,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                         case "=":
-                            if (!valueInScreen_IsEquals()) {
-                                setInListLastValue();
+                            if (!valueInScreen_IsEquals("")) {
+                                insertValueIfBtnInvertSignalWasNotClicked();
                                 Double total = returnTotalCalcule();
                                 if (!(haveValueAfterDot(convert.DoubleToStr(total)))) {
                                     printInScreenOfOperations(replaceDotToComma(valuesInScreen) + " = " + convert.IntToStr(total.intValue()));
@@ -220,8 +233,26 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private boolean valueInScreen_IsEquals() {
-        return valuesInScreen.equals("");
+    private void insertValueIfBtnInvertSignalWasNotClicked() {
+        if (!btnInvertSignalClicked) {
+            if (operations.verifyIfListValuesIsEmpty()) {
+                setInListValue();
+            } else {
+                setInListLastValue();
+            }
+        }
+    }
+
+    private void setValueInScreenIfAreMoreThanTwoValuesWhenBtnInvertWasClicked(int valueInverted) {
+        if (valueInverted < 0) {
+            updateValueInScreen(String.format(valuesInScreen.substring(0, idFirstOperator() + 1) +"(" + valueInverted + ")"));
+        } else {
+            updateValueInScreen(valuesInScreen.substring(0, idFirstOperator() + 1) + valueInverted);
+        }
+    }
+
+    private boolean valueInScreen_IsEquals(String is_equals) {
+        return valuesInScreen.equals(is_equals);
     }
 
     private void incrementValueInScreen(String value) {
@@ -229,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void insertDot() {
-        if (valueInScreen_IsEquals()) {
+        if (valueInScreen_IsEquals("")) {
             updateValueInScreen("0.");
         } else {
             incrementValueInScreen(".");
@@ -255,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public boolean haveValueAfterDot(String value) {
+    public boolean haveValueAfterDot(@NonNull String value) {
         String[] Values = value.split("\\.");
         if (Values.length > 1) {
             return !(Values[Values.length - 1].equals("0"));
@@ -263,7 +294,8 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private String replaceDotToComma(String value) {
+    @NonNull
+    private String replaceDotToComma(@NonNull String value) {
         return value.replace(".", ",");
     }
 
@@ -291,9 +323,19 @@ public class MainActivity extends AppCompatActivity {
         return "";
     }
 
+    private int idFirstOperator() {
+        for (int i = 0; i < valuesInScreen.length()-1; i++) {
+            if (listOperations.contains(Pattern.quote(Character.toString(valuesInScreen.charAt(i))))){
+                return i;
+            }
+        }
+        return 0;
+    }
     private int idLastOperator() {
-        if (listOperations.contains(Pattern.quote(getValue_ListOperations(operations.returnSizeOfOperations() - 1)))) {
-            return operations.returnSizeOfOperations() - 1;
+        for (int i = valuesInScreen.length()-1; i >= 0; i--) {
+            if (listOperations.contains(Pattern.quote(Character.toString(valuesInScreen.charAt(i))))){
+                return i;
+            }
         }
         return 0;
     }
@@ -363,24 +405,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cancelEntry() {
-        if (!valuesInScreen.isEmpty()) {
-            for (int i = valuesInScreen.length() - 1; i > 0; i--) {
-                char a = valuesInScreen.charAt(i);
-                System.out.println(a);
-                if ((listOperations.contains(Pattern.quote(Character.toString(valuesInScreen.charAt(i)))))) {
-                    updateValueInScreen(valuesInScreen.substring(0, i + 1));
-                    break;
-                }
-            }
-        }
+        updateValueInScreen(valuesInScreen.substring(0, idLastOperator()+1));
     }
 
     private void clear() {
         updateValueInScreen("");
+        btnInvertSignalClicked = false;
+        btnPercentClicked = false;
         operations.clearListOfValues();
         operations.clearOperations();
-        printInScreenOfOperations("");
-        printInScreenOfResults("");
+        printInScreenOfOperations(returnExpression());
+        printInScreenOfResults(returnExpression());
     }
 
     private int invertSignal(int value) {
@@ -397,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setInListLastValue() {
-        String[] values = splitValues(Pattern.quote(getValue_ListOperations(idLastOperator())));
+        String[] values = splitValues(Pattern.quote(Character.toString(valuesInScreen.charAt(idLastOperator()))));
         operations.setValue(values[values.length - 1]);
     }
 
@@ -433,7 +468,7 @@ public class MainActivity extends AppCompatActivity {
             printInScreenOfOperations(valuesInScreen.replace(".", ","));
             printInScreenOfResults(valuesInScreen.replace(".", ","));
         } else {
-            if (listOperations.contains(Pattern.quote(value)) && !valueInScreen_IsEquals()) {
+            if (listOperations.contains(Pattern.quote(value)) && !valueInScreen_IsEquals("")) {
                 if (isLastElementAOperator()) {
                     replaceLastValueInScreenIfIsAOperator(value);
                 } else {
@@ -456,7 +491,6 @@ public class MainActivity extends AppCompatActivity {
     private void clearScreenIfBtnPercentWasClicked() {
         if (btnPercentClicked) {
             clear();
-            btnPercentClicked = false;
         }
     }
 
