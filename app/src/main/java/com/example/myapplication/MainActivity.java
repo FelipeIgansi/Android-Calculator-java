@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private static final Set<String> listOperations;
 
     static {
-        // Pattern.quote do the escape because the characters "+" and "-" can generate problems for being used for the system
+        // Pattern.quote do the escape because the characters "+" and "-" can generate problems for being used for by the system
         listOperations = Set.of(
                 Pattern.quote("+"),
                 Pattern.quote("-"),
@@ -225,11 +225,16 @@ public class MainActivity extends AppCompatActivity {
                                     printInScreenOfOperations(replaceDotToComma(valuesInScreen) + " = " + replaceDotToComma(decimalFormat.format(total)));
                                     printInScreenOfResults(replaceDotToComma(decimalFormat.format(total)));
                                 }
-                                updateValueInScreen("");
-                                operations.clearOperations();
-                                operations.clearListOfValues();
-                                btnPercentClicked = false;
-                                setValueBtnInvertSignal(false);
+                                if (getSize_ListValue() > 1) {
+                                    updateValueInScreen("");
+                                    operations.clearOperations();
+                                    operations.clearListOfValues();
+                                    btnPercentClicked = false;
+                                    setValueBtnInvertSignal(false);
+                                }
+                                else {
+                                    clear();
+                                }
                                 break;
                             }
                     }
