@@ -4,6 +4,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                         } else if (inputOperation.equals(Pattern.quote("-"))) {
                             operations.updateOperation("+");
                         }
-                        if (btnInvertSignalClicked){
+                        if (btnInvertSignalClicked) {
                             setValueBtnInvertSignal(false);
                         }
                         calculateValue(inputOperation);
@@ -183,15 +184,13 @@ public class MainActivity extends AppCompatActivity {
                                         case "x":
                                         case "/":
                                             valueInverted = invertSignal(lastValue);
-                                            valueInput = valuesInScreen.substring(0, idFirstOperator()+1);
+                                            valueInput = valuesInScreen.substring(0, idFirstOperator() + 1);
                                             char lastCaracter = valueInput.charAt(valueInput.length() - 1);
                                             if ((lastCaracter == '+' && valueInverted < 0) || (lastCaracter == '+' && valueInverted > 0)) {
                                                 setValueInScreenIfAreMoreThanTwoValuesWhenBtnInvertWasClicked(valueInverted);
-                                            }
-                                            else if ((lastCaracter == '-' && valueInverted < 0) || (lastCaracter == '-' && valueInverted > 0)) {
+                                            } else if ((lastCaracter == '-' && valueInverted < 0) || (lastCaracter == '-' && valueInverted > 0)) {
                                                 setValueInScreenIfAreMoreThanTwoValuesWhenBtnInvertWasClicked(valueInverted);
-                                            }
-                                            else {
+                                            } else {
                                                 if ((lastCaracter == 'x' && valueInverted < 0) || (lastCaracter == '/' && valueInverted < 0)) {
                                                     updateValueInScreen(valueInput + "(" + valueInverted + ")");
                                                 } else {
@@ -210,7 +209,10 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 btnInvertSignalWasClicked();
                                 printInScreenOfResults(convert.IntToStr(valueInverted));
+                            } else {
+                                printInScreenOfOperations("Digite um valor");
                             }
+
                             break;
 
 
@@ -231,8 +233,7 @@ public class MainActivity extends AppCompatActivity {
                                     operations.clearListOfValues();
                                     btnPercentClicked = false;
                                     setValueBtnInvertSignal(false);
-                                }
-                                else {
+                                } else {
                                     clear();
                                 }
                                 break;
@@ -257,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setValueInScreenIfAreMoreThanTwoValuesWhenBtnInvertWasClicked(int valueInverted) {
         if (valueInverted < 0) {
-            updateValueInScreen(String.format(valuesInScreen.substring(0, idFirstOperator() + 1) +"(" + valueInverted + ")"));
+            updateValueInScreen(String.format(valuesInScreen.substring(0, idFirstOperator() + 1) + "(" + valueInverted + ")"));
         } else {
             updateValueInScreen(valuesInScreen.substring(0, idFirstOperator() + 1) + valueInverted);
         }
@@ -336,16 +337,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int idFirstOperator() {
-        for (int i = 0; i < valuesInScreen.length()-1; i++) {
-            if (listOperations.contains(Pattern.quote(Character.toString(valuesInScreen.charAt(i))))){
+        for (int i = 0; i < valuesInScreen.length() - 1; i++) {
+            if (listOperations.contains(Pattern.quote(Character.toString(valuesInScreen.charAt(i))))) {
                 return i;
             }
         }
         return 0;
     }
+
     private int idLastOperator() {
-        for (int i = valuesInScreen.length()-1; i >= 0; i--) {
-            if (listOperations.contains(Pattern.quote(Character.toString(valuesInScreen.charAt(i))))){
+        for (int i = valuesInScreen.length() - 1; i >= 0; i--) {
+            if (listOperations.contains(Pattern.quote(Character.toString(valuesInScreen.charAt(i))))) {
                 return i;
             }
         }
@@ -417,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cancelEntry() {
-        updateValueInScreen(valuesInScreen.substring(0, idLastOperator()+1));
+        updateValueInScreen(valuesInScreen.substring(0, idLastOperator() + 1));
     }
 
     private void clear() {
@@ -488,13 +490,16 @@ public class MainActivity extends AppCompatActivity {
                 }
                 printInScreenOfOperations(returnExpression());
             } else {
-                if (listValues[listValues.length - 1].length() - 1 == 18) {
-                    clear();
-                } else if (!(listOperations.contains(Pattern.quote(value)))) {
+                if (!(listOperations.contains(Pattern.quote(value)))) {
                     incrementValueInScreen(value);
                     listValues = splitValues();
-                    printInScreenOfOperations(returnExpression());
-                    printInScreenOfResults(formatValue(listValues[listValues.length - 1]));
+                    if (listValues[listValues.length - 1].length() == 11) {
+                        Toast.makeText(this, "Valor maximo atingido!", Toast.LENGTH_SHORT).show();
+                        clear();
+                    }else {
+                        printInScreenOfOperations(returnExpression());
+                        printInScreenOfResults(formatValue(listValues[listValues.length - 1]));
+                    }
                 }
             }
         }
