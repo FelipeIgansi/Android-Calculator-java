@@ -477,31 +477,35 @@ public class MainActivity extends AppCompatActivity {
         String[] listValues = splitValues();
         playFeedbackSound();// Every moment that user press one button and insert then in screen play feedback sound
         clearScreenIfBtnPercentWasClicked();// If percent was clicked AND user insert more values clear screen
-        if (haveComma(listValues[listValues.length - 1])) {
-            incrementValueInScreen(value);
-            printInScreenOfOperations(valuesInScreen.replace(".", ","));
-            printInScreenOfResults(valuesInScreen.replace(".", ","));
-        } else {
-            if (listOperations.contains(Pattern.quote(value)) && !valueInScreen_IsEquals("")) {
-                if (isLastElementAOperator()) {
-                    replaceLastValueInScreenIfIsAOperator(value);
-                } else {
-                    incrementValueInScreen(value);
-                }
-                printInScreenOfOperations(returnExpression());
+        if (!(valuesInScreen.equals("") && value.equals("0"))) {
+            if (haveComma(listValues[listValues.length - 1])) {
+                incrementValueInScreen(value);
+                printInScreenOfOperations(valuesInScreen.replace(".", ","));
+                printInScreenOfResults(valuesInScreen.replace(".", ","));
             } else {
-                if (!(listOperations.contains(Pattern.quote(value)))) {
-                    incrementValueInScreen(value);
-                    listValues = splitValues();
-                    if (listValues[listValues.length - 1].length() == 11) {
-                        Toast.makeText(this, "Valor maximo atingido!", Toast.LENGTH_SHORT).show();
-                        clear();
-                    }else {
-                        printInScreenOfOperations(returnExpression());
-                        printInScreenOfResults(formatValue(listValues[listValues.length - 1]));
+                if (listOperations.contains(Pattern.quote(value)) && !valueInScreen_IsEquals("")) {
+                    if (isLastElementAOperator()) {
+                        replaceLastValueInScreenIfIsAOperator(value);
+                    } else {
+                        incrementValueInScreen(value);
+                    }
+                    printInScreenOfOperations(returnExpression());
+                } else {
+                    if (!(listOperations.contains(Pattern.quote(value)))) {
+                        incrementValueInScreen(value);
+                        listValues = splitValues();
+                        if (listValues[listValues.length - 1].length() == 11) {
+                            Toast.makeText(this, "Valor maximo atingido!", Toast.LENGTH_SHORT).show();
+                            clear();
+                        } else {
+                            printInScreenOfOperations(returnExpression());
+                            printInScreenOfResults(formatValue(listValues[listValues.length - 1]));
+                        }
                     }
                 }
             }
+        }else {
+            clear();
         }
     }
 
