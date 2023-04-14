@@ -293,7 +293,11 @@ public class MainActivity extends AppCompatActivity {
             if (getSize_ListValue() >= 2) {
                 double total = returnTotalCalcule();
                 clear();
-                updateValueInScreen(convert.IntToStr((int) (total)));
+                if (!value_isDouble) {
+                    updateValueInScreen(convert.IntToStr((int) (total)));
+                }else {
+                    updateValueInScreen(convert.DoubleToStr(total));
+                }
                 operations.setValue(convert.DoubleToStr(total));
             }
         }
@@ -474,7 +478,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setValuesInScreen(String value) {
-        String[] listValues = splitValues();
+        String[] listValues;
         clearScreenIfBtnPercentWasClicked();// If percent was clicked AND user insert more values clear screen
         if (!(valuesInScreen.equals("") && value.equals("0"))) {
             /*incrementValueInScreen(value);
