@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
                                 btnInvertSignalWasClicked();
                                 printInScreenOfResults(convert.IntToStr(valueInverted));
                             } else {
-                                printInScreenOfOperations("Digite um valor");
+                                Toast.makeText(this,"Digite um valor",Toast.LENGTH_SHORT).show();
                             }
 
                             break;
