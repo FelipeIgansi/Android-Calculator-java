@@ -70,26 +70,14 @@ public class Operation implements Serializable {
     public void updateOperation(String value) {
         removeLastOperation();
         setOperation(value);
-
     }
 
     public void removeLastOperation() {
         this.operation.remove(returnSizeOfOperations() - 1);
     }
-    public void removeOperation(int id) {
-        this.operation.remove(id);
-    }
-    public void removeValue(int id) {
-        this.operation.remove(id);
-    }
-
 
     public void setOperation(String operation) {
         this.operation.add(operation);
-    }
-
-    public boolean isListValueEmpty() {
-        return this.value.isEmpty();
     }
 
     public boolean verifyIfOperationIsEmpty() {

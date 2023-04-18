@@ -49,8 +49,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Start the player
-//        media = MediaPlayer.create(this, R.raw.feedback_sound_click);
         startButtons();
     }
 
@@ -93,18 +91,24 @@ public class MainActivity extends AppCompatActivity {
                 case "/":
                     // Insert the operations and calculate if have more than 2 values
                     if (!valueInScreen_IsEmpty()) {
-                        if (!btnInvertSignalClicked) {
-                            setInListValue();
-                        } else if (inputOperation.equals(Pattern.quote("-"))) {
-                            operations.updateOperation("+");
-                        }
-                        if (btnInvertSignalClicked) {
-                            setValueBtnInvertSignal(false);
-                        }
+/*                        if (getSize_ListOperations() >= 1) {
+                            String[] values = splitValues(Pattern.quote(operations.getOperation(0)));
+                            if (btnInvertSignalClicked) {
+                                if (values.length >= 2) {
+                                    setInListLastValue();
+                                }
+                            } else {
+                                setInListValue();
+                            }
+                        }*/
+                        insertValueIfBtnInvertSignalWasNotClicked();
                         calculateValue(inputOperation);
                         insertOperationIn_ListOperation(inputOperation);
                         setValuesInScreen(inputOperation);
                         printInScreenOfOperations(returnExpression());
+                        if (btnInvertSignalClicked) {
+                            setValueBtnInvertSignal(false);
+                        }
                         break;
                     }
             }
@@ -207,10 +211,10 @@ public class MainActivity extends AppCompatActivity {
                                     updateValueInScreen(convert.IntToStr(valueInverted));
                                     printInScreenOfOperations(convert.IntToStr(valueInverted));
                                 }
-                                btnInvertSignalWasClicked();
+                                btnInvertSignalWasClicked(); // TRUE
                                 printInScreenOfResults(convert.IntToStr(valueInverted));
                             } else {
-                                Toast.makeText(this,"Digite um valor",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "Digite um valor", Toast.LENGTH_SHORT).show();
                             }
 
                             break;
@@ -242,12 +246,22 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+
+    /**
+     * Methods
+     */
+
+
+    private void btnInvertSignalWasClicked() {
+        setValueBtnInvertSignal(true);
+    }
+
     private void setValueBtnInvertSignal(boolean status) {
         btnInvertSignalClicked = status;
     }
 
     private void insertValueIfBtnInvertSignalWasNotClicked() {
-        if (!btnInvertSignalClicked) {
+        if (!btnInvertSignalClicked && !isLastElementAOperator()) {
             if (operations.verifyIfListValuesIsEmpty()) {
                 setInListValue();
             } else {
@@ -272,13 +286,6 @@ public class MainActivity extends AppCompatActivity {
         valuesInScreen += value;
     }
 
-    private void insertDot() {
-        if (valueInScreen_IsEmpty()) {
-            updateValueInScreen("0.");
-        } else {
-            incrementValueInScreen(".");
-        }
-    }
 
     private void insertOperationIn_ListOperation(String inputOperation) {
         if (listOperations.contains(Pattern.quote(retornLastCaracter_ListValue()))) {
@@ -295,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
                 clear();
                 if (!value_isDouble) {
                     updateValueInScreen(convert.IntToStr((int) (total)));
-                }else {
+                } else {
                     updateValueInScreen(convert.DoubleToStr(total));
                 }
                 operations.setValue(convert.DoubleToStr(total));
@@ -317,14 +324,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Double returnTotalCalcule() {
-        Double total = convert.StrToDouble(getValue_ListValue(0));
-        total = getTotal(total);
-        return total;
+        if (getSize_ListValue() == 2) {
+            double val1 = convert.StrToDouble(operations.getValue(0));
+            double val2 = convert.StrToDouble(operations.getValue(1));
+            switch (operations.getOperation(0)) {
+                case "+":
+                    return operations.sum(val1, val2);
+                case "-":
+                    return operations.subtraction(val1, val2);
+                case "x":
+                    return operations.multiplication(val1, val2);
+                case "/":
+                    return operations.division(val1, val2);
+            }
+        } else {
+            Toast.makeText(this, "Ocorreu um erro ao realizar o calculo!", Toast.LENGTH_SHORT).show();
+        }
+        return 0.0;
     }
 
-    private void btnInvertSignalWasClicked() {
-        setValueBtnInvertSignal(true);
-    }
 
     private void btnPercentClicked() {
         btnPercentClicked = true;
@@ -369,35 +387,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-
-    private Double getTotal(Double total) {
-        int j = 1;
-        for (int i = 0; i < operations.returnSizeOfOperations(); i++) {
-            label:
-            for (int r = j; r <= getSize_ListValue(); r++) {
-                switch (getValue_ListOperations(i)) {
-                    case "+":
-                        total = operations.sum(total, convert.StrToDouble(getValue_ListValue(r)));
-                        j = r + 1;
-                        break label;
-                    case "-":
-                        total = operations.subtraction(total, convert.StrToDouble(getValue_ListValue(r)));
-                        j = r + 1;
-                        break label;
-                    case "x":
-                        total = operations.multiplication(total, convert.StrToDouble(getValue_ListValue(r)));
-                        j = r + 1;
-                        break label;
-                    case "/":
-                        total = operations.division(total, convert.StrToDouble(getValue_ListValue(r)));
-                        j = r + 1;
-                        break label;
-                }
-            }
-        }
-        return total;
-    }
-
     private double getPercent() {
         return convert.StrToDouble(getValue_ListValue(getSize_ListValue() - 1)) / 100;
     }
@@ -428,7 +417,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void clear() {
         updateValueInScreen("");
-        setValueBtnInvertSignal(false);
         btnPercentClicked = false;
         operations.clearListOfValues();
         operations.clearOperations();
@@ -481,34 +469,27 @@ public class MainActivity extends AppCompatActivity {
         String[] listValues;
         clearScreenIfBtnPercentWasClicked();// If percent was clicked AND user insert more values clear screen
         if (!(valuesInScreen.equals("") && value.equals("0"))) {
-            /*incrementValueInScreen(value);
-            if (haveComma(listValues[listValues.length - 1]) && !isLastElementAOperator()) {
-                printInScreenOfOperations(valuesInScreen.replace(".", ","));
-                printInScreenOfResults(valuesInScreen.replace(".", ","));
-
-            } else {*/
-                if (listOperations.contains(Pattern.quote(value)) && !valueInScreen_IsEmpty()) {
-                    if (isLastElementAOperator()) {
-                        replaceLastValueInScreenIfIsAOperator(value);
-                    } else {
-                        incrementValueInScreen(value);
-                    }
-                    printInScreenOfOperations(returnExpression());
+            if (listOperations.contains(Pattern.quote(value)) && !valueInScreen_IsEmpty()) {
+                if (isLastElementAOperator()) {
+                    replaceLastValueInScreenIfIsAOperator(value);
                 } else {
-                    if (!(listOperations.contains(Pattern.quote(value)))) {
-                        incrementValueInScreen(value);
-                        listValues = splitValues();
-                        if (listValues[listValues.length - 1].length() == 11) {
-                            Toast.makeText(this, "Valor maximo atingido!", Toast.LENGTH_SHORT).show();
-                            clear();
-                        } else {
-                            printInScreenOfOperations(returnExpression());
-                            printInScreenOfResults(formatValue(listValues[listValues.length - 1]));
-                        }
+                    incrementValueInScreen(value);
+                }
+                printInScreenOfOperations(returnExpression());
+            } else {
+                if (!(listOperations.contains(Pattern.quote(value)))) {
+                    incrementValueInScreen(value);
+                    listValues = splitValues();
+                    if (listValues[listValues.length - 1].length() == 11) {
+                        Toast.makeText(this, "Valor maximo atingido!", Toast.LENGTH_SHORT).show();
+                        clear();
+                    } else {
+                        printInScreenOfOperations(returnExpression());
+                        printInScreenOfResults(formatValue(listValues[listValues.length - 1]));
                     }
                 }
             }
-        else {
+        } else {
             clear();
         }
     }
@@ -519,10 +500,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    private void playFeedbackSound() {
-//        media.start();
-//    }
-
     public void replaceLastValueInScreenIfIsAOperator(String value) {
         updateValueInScreen(valuesInScreen.substring(0, valuesInScreen.length() - 1) + value);
     }
@@ -532,12 +509,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public String formatValue(String value) {
-        if (!value_isDouble){
+        if (!value_isDouble) {
             return numberFormat.format(convert.StrToLong(value));
-        }else {
+        } else {
             return numberFormat.format(convert.StrToDouble(value));
         }
     }
+
+    private void insertDot() {
+        if (valueInScreen_IsEmpty()) {
+            updateValueInScreen("0.");
+        } else {
+            incrementValueInScreen(".");
+        }
+    }
+
 
     private void printInScreenOfOperations(String value) {
         TextView txtOperations = findViewById(R.id.txtPrintOperations);
