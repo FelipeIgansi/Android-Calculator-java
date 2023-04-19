@@ -10,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.model.Operation;
 import com.example.myapplication.util.Convert;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -38,22 +41,29 @@ public class MainActivity extends AppCompatActivity {
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance(localeBR);
     private final DecimalFormat decimalFormat = new DecimalFormat("0.##");
     public String valuesInScreen = "";
-    //    private MediaPlayer media;
     private Button button;
     private boolean btnPercentClicked = false;
     private boolean btnInvertSignalClicked = false;
     private boolean value_isDouble = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         startButtons();
+        startAd();
+    }
+
+    private void startAd() {
+        MobileAds.initialize(this, initializationStatus -> {
+        });
+
+        AdView mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     private void startButtons() {
-        // One method for insert values, one for insert the operations and one for make the functions
         setValue(R.id.btn_One, 1);
         setValue(R.id.btn_Two, 2);
         setValue(R.id.btn_Three, 3);
@@ -89,18 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 case "-":
                 case "x":
                 case "/":
-                    // Insert the operations and calculate if have more than 2 values
                     if (!valueInScreen_IsEmpty()) {
-/*                        if (getSize_ListOperations() >= 1) {
-                            String[] values = splitValues(Pattern.quote(operations.getOperation(0)));
-                            if (btnInvertSignalClicked) {
-                                if (values.length >= 2) {
-                                    setInListLastValue();
-                                }
-                            } else {
-                                setInListValue();
-                            }
-                        }*/
                         insertValueIfBtnInvertSignalWasNotClicked();
                         calculateValue(inputOperation);
                         insertOperationIn_ListOperation(inputOperation);
@@ -120,11 +119,11 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(
                 view -> {
                     switch (function) {
-                        case "C":// CLear all values in screen
+                        case "C":
                             clear();
                             break;
 
-                        case "CE": // Cancel last entry data
+                        case "CE":
                             if (getSize_ListOperations() < 1) {
                                 clear();
                             } else {
@@ -133,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                             printInScreenOfOperations(valuesInScreen);
                             printInScreenOfResults("");
                             break;
-                        case ",":// Insert dot(In Brazil is Comma) becouse this it is made the replace
+                        case ",":
                             String[] values = splitValues();
                             if (!(haveComma(values[values.length - 1]))) {
                                 insertDot();
@@ -142,8 +141,7 @@ public class MainActivity extends AppCompatActivity {
                                 printInScreenOfResults(valuesInScreen);
                             }
                             break;
-                        case "%":// This function will do two things: if the operations is '+' or '-'
-                            // will insert the value * percent and if the operations is 'x' or '/' print just percent
+                        case "%":
                             if (!valueInScreen_IsEmpty()) {
                                 setInListValue();
                                 String[] Values = splitValues();
@@ -170,12 +168,12 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 operations.removeLastValue();
                                 btnPercentClicked();
-                                printInScreenOfOperations(replaceDotToComma(returnExpression()));// Print Expression with value of percent calculated
-                                printInScreenOfResults(Values[Values.length - 1] + "%");//When is press '%' insert this caracter in screen
+                                printInScreenOfOperations(replaceDotToComma(returnExpression()));
+                                printInScreenOfResults(Values[Values.length - 1] + "%");
                                 break;
                             }
 
-                        case "+/-":// Invert the signal do make a validation for if the value in screen have operation
+                        case "+/-":
                             if (!valueInScreen_IsEmpty()) {
                                 insertValueIfBtnInvertSignalWasNotClicked();
                                 int lastValue = convert.StrToInt(operations.getValue(getSize_ListValue() - 1));
@@ -467,7 +465,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setValuesInScreen(String value) {
         String[] listValues;
-        clearScreenIfBtnPercentWasClicked();// If percent was clicked AND user insert more values clear screen
+        clearScreenIfBtnPercentWasClicked();
         if (!(valuesInScreen.equals("") && value.equals("0"))) {
             if (listOperations.contains(Pattern.quote(value)) && !valueInScreen_IsEmpty()) {
                 if (isLastElementAOperator()) {
